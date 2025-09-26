@@ -30,47 +30,54 @@ export default function ProductGallery() {
   };
   // const randomNumber = Math.floor(Math.random() * 10001);
 
-  if (!user?._id) {
+  let guestId = localStorage.getItem("guestId");
+
+  if (!guestId) {
     let guestId = `guest-${crypto.randomUUID()}`;
     localStorage.setItem("guestId", guestId);
   }
   const handleAddToCart = async (product) => {
     setLoadingProductId(product._id);
-    let guestId = localStorage.getItem("guestId");
+    let guestId = user?._id ? localStorage.getItem("guestId"):null;
+    console.log(guestId);
 
     console.log(user);
 
-    const userId = user?._id || guestId;
+    // const userId = user?._id || guestId;
+    const userId = user?._id;
+
     console.log(userId);
 
     console.log(product);
 
     try {
-      if (userId) {
-        await dispatch(
-          addToCart({
-            userId,
-            productId: product._id,
-            variantId: product.variants?.[0]?._id || null,
-            quantity: 1,
-          })
-        ).unwrap();
-        toast.success("Item added to cart successfully!");
-      } else {
-        const storedCart = JSON.parse(localStorage.getItem("addToCart")) || [];
-        const existingIndex = storedCart.findIndex(
-          (item) => item._id === product._id
-        );
+      // if (userId) {
+      await dispatch(
+        addToCart({
+          userId,
+          guestId,
+          productId: product._id,
+          variantId: product.variants?.[0]?._id || null,
+          quantity: 1,
+        })
+      ).unwrap();
+      toast.success("Item added to cart successfully!");
+      // }
+      //  else {
+      //   const storedCart = JSON.parse(localStorage.getItem("addToCart")) || [];
+      //   const existingIndex = storedCart.findIndex(
+      //     (item) => item._id === product._id
+      //   );
 
-        if (existingIndex > -1) {
-          storedCart[existingIndex].quantity += 1;
-        } else {
-          storedCart.push({ ...product, quantity: 1 });
-        }
+      //   if (existingIndex > -1) {
+      //     storedCart[existingIndex].quantity += 1;
+      //   } else {
+      //     storedCart.push({ ...product, quantity: 1 });
+      //   }
 
-        localStorage.setItem("addToCart", JSON.stringify(storedCart));
-        toast.success("Item added to cart successfully!");
-      }
+      //   localStorage.setItem("addToCart", JSON.stringify(storedCart));
+      //   toast.success("Item added to cart successfully in localhost!");
+      // }
     } catch (err) {
       toast.error("Failed to add to cart");
     } finally {

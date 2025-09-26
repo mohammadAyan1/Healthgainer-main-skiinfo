@@ -5,8 +5,12 @@ import API from "../../lib/api";
 export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
   async (userId, { rejectWithValue }) => {
+    console.log(userId);
+
     try {
       const response = await API.get(`/cart?userId=${userId}`);
+      console.log(response);
+
       return response.data.cart[0]?.items || [];
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error fetching cart");
@@ -17,10 +21,14 @@ export const fetchCart = createAsyncThunk(
 // Add to cart
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
-  async ({ userId, productId, variantId, quantity }, { rejectWithValue }) => {
+  async (
+    { userId, guestId, productId, variantId, quantity },
+    { rejectWithValue }
+  ) => {
     try {
       const response = await API.post(`/cart/add`, {
         userId,
+        guestId,
         productId,
         variantId,
         quantity,

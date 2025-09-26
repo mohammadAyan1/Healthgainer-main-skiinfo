@@ -26,8 +26,15 @@ export default function CartPage() {
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
+    if (!user?._id) {
+      let guestId = localStorage.getItem("guestId");
+      console.log(guestId);
+    }
+
     if (user?._id) {
       dispatch(fetchCart(user._id));
+    } else {
+      dispatch(fetchCart(guestId));
     }
   }, [dispatch, user]);
 
@@ -56,6 +63,8 @@ export default function CartPage() {
   //   (cartItems || [])?.reduce((count, item) => count + (item.quantity || 0), 0);
   const calculateItemCount = () =>
     (cartItems || []).reduce((count, item) => count + (item.quantity || 0), 0);
+
+  // console.log(cartItems);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">

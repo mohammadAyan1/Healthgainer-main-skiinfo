@@ -4,7 +4,8 @@ const { v4: uuidv4 } = require("uuid");
 
 exports.addToCart = async (req, res) => {
   try {
-    const { userId, productId, variantId, quantity } = req.body;
+    const { userId, guestId, productId, variantId, quantity } = req.body;
+    console.log(req.body);
 
     const product = await Product.findById(productId);
     if (!product)
@@ -33,8 +34,16 @@ exports.addToCart = async (req, res) => {
     const price = variant.mrp - (variant.mrp * variant.discount) / 100;
     const subtotal = price * quantity;
 
-    let cart = await Cart.findOne({ userId });
-    if (!cart) cart = new Cart({ userId, items: [] });
+    let cart = await Cart.findOne({
+      $or: [{ userId: userId }, { guestId: guestId }],
+    });
+
+    if (userId) {
+      cart = await Cart.findOne({userId})
+    }else{
+      cart = await Cart.findOne({guestId})
+    }
+    if (!cart) cart = new Cart({ userId, guestId, items: [] });
 
     // Check if same product (variantId or productId if variantId missing)
     const itemIndex = cart.items.findIndex((item) =>
@@ -130,10 +139,26 @@ exports.updateCartItemQuantity = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
 exports.getCart = async (req, res) => {
   try {
     const { userId } = req.query || req.body;
-    const cart = await Cart.find({ userId }).populate("items.productId");
+    console.log(userId);
+    // console.log(guestId);
+
+    let cart;
+
+    if (typeof userId === "string" && userId?.startsWith("guest-")) {
+      cart = await Cart.findOne({ guestId: userId }).populate(
+        "items.productId"
+      );
+    } else {
+      cart = await Cart.findOne({ userId }).populate("items.productId");
+    }
+
+    // const cart = await Cart.find({
+    //   $or: [{ userId: userId }, { guestId: guestId }],
+    // }).populate("items.productId");
 
     console.log(cart);
 

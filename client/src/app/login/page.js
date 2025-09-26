@@ -87,7 +87,7 @@ export default function LoginPage() {
 
             if (res?.success) {
               const unauthorizeID = localStorage.getItem("randomNumber");
-              
+              localStorage.removeItem("guestId")
               toast.success("Login Successful!");
               router.push("/");
             }
