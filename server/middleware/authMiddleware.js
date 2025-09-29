@@ -4,9 +4,7 @@ require('dotenv').config();
 const isAuthenticated = async (req, res, next) => {
     try {
         let token = req.header('Authorization')?.replace('Bearer ', '') || req.cookies.token;
-        console.log('Token received:', token);
-
-        // Remove extra double quotes if present
+       
         if (token && token.startsWith('"') && token.endsWith('"')) {
             token = token.slice(1, -1);
         }
@@ -28,7 +26,7 @@ const isAuthenticated = async (req, res, next) => {
         req.id = verified.id;
         next();
     } catch (error) {
-        console.log('JWT Error:', error);
+        
         return res.status(401).json({ message: "Authentication failed." });
     }
 };

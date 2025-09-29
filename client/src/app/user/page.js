@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-// import LoadingProfile from "@/components/LoadingProfile";
+
 import {
   FiEdit,
   FiUser,
@@ -14,7 +14,7 @@ import {
 
 export default function ProfilePage() {
   const [userData, setUserData] = useState(null);
-  console.log(userData);
+  
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -25,9 +25,9 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    // Fetch user data from localStorage
+    
     const storedUser = localStorage.getItem("user");
-    console.log(storedUser);
+    
 
     if (storedUser) {
       setUserData(JSON.parse(storedUser) );
@@ -43,10 +43,10 @@ export default function ProfilePage() {
   };
 
   const handleSave = () => {
-    // Here you would typically send the updated data to your backend
+    
     const updatedUser = { ...userData, ...formData };
     localStorage.setItem("user", JSON.stringify(updatedUser));
-    // localStorage.setItem("token", data.token); // or whatever your backend returns
+    
 
     setUserData(updatedUser);
     setIsEditing(false);

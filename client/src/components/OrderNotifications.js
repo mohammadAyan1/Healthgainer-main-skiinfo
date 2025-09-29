@@ -5,7 +5,7 @@ const OrderNotifications = () => {
   const [newOrders, setNewOrders] = useState([]);
   const eventSourceRef = useRef(null);
   const handleMessage = useCallback((event) => {
-    console.log("🎯 SSE Event Received:", event.data);
+    
 
     if (event.data !== "{}") {
       const newOrder = JSON.parse(event.data);
@@ -31,7 +31,7 @@ const OrderNotifications = () => {
     eventSource.onerror = handleError;
 
     return () => {
-      console.log("Closing SSE Connection...");
+      
       eventSource.close();
       eventSourceRef.current = null;
     };

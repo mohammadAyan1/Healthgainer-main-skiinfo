@@ -65,7 +65,7 @@ const ContactList = () => {
     indexOfLastContact
   );
 
-  // CSV Headers (Include phone explicitly)
+  
   const csvHeaders = [
     { label: "Name", key: "name" },
     { label: "Email", key: "email" },

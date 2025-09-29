@@ -8,7 +8,7 @@ function AdminLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
-  // Apply dark mode class to body
+  
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -17,7 +17,7 @@ function AdminLayout({ children }) {
     }
   }, [darkMode]);
 
-  // Close sidebar when resizing to desktop
+  
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {

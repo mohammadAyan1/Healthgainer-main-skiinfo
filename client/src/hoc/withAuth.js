@@ -11,8 +11,7 @@ const withAuth = (WrappedComponent, allowedRoles) => {
       const token = localStorage.getItem("token");
       const userData = localStorage.getItem("user");
 
-      console.log("Token:", token);
-      console.log("User Data:", userData);
+
 
       let userRole = null;
       if (userData) {

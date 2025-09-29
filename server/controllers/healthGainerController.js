@@ -38,7 +38,7 @@ exports.getHealthGainerByProduct = async (req, res) => {
 exports.createHealthGainer = async (req, res) => {
   try {
     const newTab = new HealthGainer(req.body);
-    console.log(newTab);
+    
     
     await newTab.save();
     res.status(201).json(newTab);

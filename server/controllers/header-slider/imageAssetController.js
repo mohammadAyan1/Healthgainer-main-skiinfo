@@ -8,9 +8,7 @@ exports.createImage = async (req, res) => {
 
     const { viewType } = req.body; // default to 'desktop'
 
-    console.log(req.body, "D");
-
-    // Ensure images are uploaded
+   
     if (!files || !files.images) {
       return res.status(400).json({
         success: false,
@@ -22,7 +20,7 @@ exports.createImage = async (req, res) => {
       ? files.images
       : [files.images];
 
-    // Upload all images to ImageKit
+    
     const uploadedImages = await Promise.all(
       imagesArray.map(async (file) => {
         try {

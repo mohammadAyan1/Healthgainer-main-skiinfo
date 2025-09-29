@@ -33,7 +33,7 @@ export default function RegisterPage() {
     setIsMounted(true);
   }, []);
 
-  // Show error toast if there's an error
+  
   useEffect(() => {
     if (error) {
       toast.error(error.message || "An error occurred");
@@ -82,7 +82,7 @@ export default function RegisterPage() {
     dispatch(getOTP({ firstName, lastName, email, mobileNumber, password }))
       .unwrap()
       .then((res) => {
-        console.log(res);
+        
 
         if (res?.success) {
           setHideForm(true);
@@ -90,7 +90,7 @@ export default function RegisterPage() {
         }
 
         toast.success("OTP generated successfull");
-        // router.push("/login");
+        
       })
       .catch((err) => {
         toast.error(err || "Registration failed");
@@ -224,7 +224,7 @@ export default function RegisterPage() {
                             lastName: e.target.value,
                           })
                         }
-                        // required
+                        
                       />
                     </div>
                   </div>

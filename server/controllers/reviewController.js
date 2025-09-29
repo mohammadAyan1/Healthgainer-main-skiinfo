@@ -1,12 +1,10 @@
 const Review = require("../models/reviewModel");
 
-// @desc Create a review
-// @route POST /api/reviews
-// @access Private
+
 exports.createReview = async (req, res) => {
   try {
     const { productId, rating, title, comment } = req.body;
-    console.log(req.body);
+    
     
 
     if (!productId || !rating || !title || !comment) {
@@ -28,9 +26,7 @@ exports.createReview = async (req, res) => {
   }
 };
 
-// @desc Get all reviews for a product
-// @route GET /api/reviews/:productId
-// @access Public
+
 exports.getReviewsByProduct = async (req, res) => {
   try {
     const reviews = await Review.find({ productId: req.params.productId }).populate("userId", "firstName lastName");
@@ -40,9 +36,7 @@ exports.getReviewsByProduct = async (req, res) => {
   }
 };
 
-// @desc Delete a review
-// @route DELETE /api/reviews/:id
-// @access Private
+
 exports.deleteReview = async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);

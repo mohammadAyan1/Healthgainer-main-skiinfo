@@ -29,6 +29,22 @@ const Navbar = () => {
     }
   }, [dispatch, user?._id]);
 
+ useEffect(() => {
+    let guestId;
+    if (!user?._id) {
+      guestId = localStorage.getItem("guestId");
+      
+    }
+
+    if (user?._id) {
+      dispatch(fetchCart(user._id));
+    } else {
+      dispatch(fetchCart(guestId));
+    }
+  }, [dispatch, user]);
+
+
+
   const navLinks = [
     { label: 'Home', href: '/', icon: <FaHome className="text-green-500" /> },
     { label: 'Product', href: '/product' },

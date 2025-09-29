@@ -112,21 +112,19 @@ exports.updateProduct = async (req, res) => {
   try {
     const { name, description, category, mrp, discount, stock, status } =
       req.body;
-    console.log(req.body, "req.body");
+    
     const existingImages = Object.keys(req.body)
       .filter((key) => key.startsWith("existingImages[")) // Filter only existingImages keys
       .sort((a, b) => a.localeCompare(b)) // Sort to maintain order
       .map((key) => req.body[key]); // Extract values
 
-    console.log("Parsed Existing Images:", existingImages);
+    
 
     if (!Array.isArray(existingImages)) {
       existingImages = existingImages ? [existingImages] : [];
     }
 
-    console.log("Existing Images:", existingImages);
-    // console.log("Uploaded Files:", req.files);
-    // console.log("Params:", req.params);
+   
 
     const product = await Product.findById(req.params.id);
     if (!product) {

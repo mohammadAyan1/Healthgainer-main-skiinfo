@@ -8,8 +8,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import API from "@/lib/api";
-import { addToCart } from "@/redux/slices/cartSlice";
-
+import { addToCart, updateCartGuestIdToUserId } from "@/redux/slices/cartSlice";
 
 export default function LoginPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -71,43 +70,59 @@ export default function LoginPage() {
       });
   };
 
+ 
   const confirmOTP = async () => {
-    setIsConfirmingOTP(true);
-    try {
-      if (OTPNumber == OtpForCheck) {
-        if (!loginForm.phone) {
-          toast.error("Please fill in all fields");
-          return;
-        }
-
-        dispatch(loginUser({ loginForm }))
-          .unwrap()
-          .then((res) => {
-            console.log(res);
-
-            if (res?.success) {
-              const unauthorizeID = localStorage.getItem("randomNumber");
-              localStorage.removeItem("guestId")
-              toast.success("Login Successful!");
-              router.push("/");
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-          })
-          .finally(() => {
-            setIsConfirmingOTP(false);
-          });
-      } else {
-        toast.error("Wrong OTP");
-        setIsConfirmingOTP(false);
+  setIsConfirmingOTP(true);
+  try {
+    if (OTPNumber == OtpForCheck) {
+      if (!loginForm.phone) {
+        toast.error("Please fill in all fields");
+        return;
       }
-    } catch (error) {
-      console.error(error);
+
+      dispatch(loginUser({ loginForm }))
+        .unwrap()
+        .then(async (res) => {
+          if (res?.success) {
+            const GuestIdCheck = localStorage.getItem("guestId");
+            const UserId = res.user._id;
+
+            if (GuestIdCheck) {
+              try {
+                const result = await dispatch(
+                  updateCartGuestIdToUserId({ GuestIdCheck, UserId })
+                ).unwrap();
+
+                console.log("Cart updated:", result);
+
+                // ✅ Remove guest cart id from localStorage after success
+                localStorage.removeItem("guestId");
+              } catch (err) {
+                console.error("Error merging cart:", err);
+              }
+            }
+
+            toast.success("Login Successful!");
+            router.push("/");
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        })
+        .finally(() => {
+          setIsConfirmingOTP(false);
+        });
+    } else {
+      toast.error("Wrong OTP");
       setIsConfirmingOTP(false);
     }
-  };
+  } catch (error) {
+    console.error(error);
+    setIsConfirmingOTP(false);
+  }
+};
 
+  
   const resendOTP = async () => {
     setIsResendingOTP(true);
     try {

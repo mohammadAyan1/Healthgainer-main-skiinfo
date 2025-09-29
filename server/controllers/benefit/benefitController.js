@@ -30,7 +30,7 @@ exports.createBenefit = async (req, res) => {
       fileName: `benefit_${Date.now()}.jpg`,
       folder: "/benefits",
     });
-    // console.log(uploaded)
+    
 
     const total = await Benefit.countDocuments();
     const newBenefit = await Benefit.create({

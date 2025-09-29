@@ -19,7 +19,7 @@ const CheckoutButton = ({ total, orderData }) => {
       script.async = true;
 
       script.onload = () => {
-        console.log("Razorpay SDK loaded");
+        
         resolve(true);
       };
 
@@ -49,7 +49,7 @@ const CheckoutButton = ({ total, orderData }) => {
       const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "");
       const createOrderURL = `${baseURL}/payment/create-order`;
       
-      console.log("Creating order at:", createOrderURL);
+      
 
       const { data } = await axios.post(createOrderURL, {
         amount: total

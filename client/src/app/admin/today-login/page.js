@@ -7,7 +7,7 @@ import { todayLogins } from '@/redux/slices/authSlice';
 export default function TodayLogin() {
   const dispatch = useDispatch();
   const  users = useSelector((state) => state?.auth?.users || []);
-//   const {  error } = useSelector((state) => state?.auth || {});
+
   const [formattedUsers, setFormattedUsers] = useState([]);
 
   useEffect(() => {
@@ -25,13 +25,7 @@ export default function TodayLogin() {
     }
   }, [users]);
 
-//   if (loading) {
-//     return <div>Loading...</div>;
-//   }
 
-//   if (error) {
-//     return <div className="text-red-500">Error: {error}</div>;
-//   }
 
   return (
     <div className="container mx-auto p-4 card-body-main">

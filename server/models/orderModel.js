@@ -1,20 +1,3 @@
-// const mongoose = require("mongoose");
-
-// const orderSchema = new mongoose.Schema(
-//   {
-//     razorpayOrderId: { type: String, required: true, unique: true },
-//     razorpayPaymentId: { type: String },
-//     razorpaySignature: { type: String },
-//     amount: Number,
-//     currency: String,
-//     receipt: String,
-//     status: { type: String, default: "created" },
-//   },
-//   { timestamps: true }
-// );
-
-// module.exports = mongoose.model("Order", orderSchema);
-
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
@@ -48,11 +31,7 @@ const orderSchema = new mongoose.Schema(
       },
     ],
     totalAmount: { type: Number },
-    // address: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Address",
-    //   required: true,
-    // },
+
     address: {
       fullName: { type: String, required: true },
       phone: { type: String, required: true },

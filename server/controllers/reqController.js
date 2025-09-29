@@ -8,10 +8,7 @@ exports.createReq = async (req, res) => {
     if (!name || !email) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    // if (!message && !phone) {
-    //   return res.status(400).json({ message: 'At least one field (email or phone) is required' });
-    // }
-    // Create a new contact instance
+   
     const newReq = new Req({
       name,
       message,

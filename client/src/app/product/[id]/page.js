@@ -29,20 +29,11 @@ export default function ProductDetailPage() {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  console.log(product);
-
   useEffect(() => {
     if (id) {
       dispatch(fetchProductById(id));
     }
   }, [id, dispatch]);
-
-  // useEffect(() => {
-  //   if (product && product.images) {
-  //     setSelectedImage(product.images[0] || "");
-  //     setSelectedVariant(product.variants?.[0] || null);
-  //   }
-  // }, [product]);
 
   useEffect(() => {
     if (product && product.images) {
@@ -76,32 +67,6 @@ export default function ProductDetailPage() {
     setSelectedImage(product.images[prevIndex]);
   };
 
-  // const handleAddToCart = () => {
-  //   if (!selectedVariant) {
-  //     toast.error("Please select a variant before adding to cart.");
-  //     return;
-  //   }
-
-  //   const userId = "user123";
-  //   dispatch(
-  //     addToCart({
-  //       userId,
-  //       productId: product._id,
-  //       variantId: selectedVariant._id,
-  //       quantity,
-  //     })
-  //   )
-  //     .unwrap()
-  //     .then(() => {
-  //       toast.success("Item added to cart successfully!");
-  //     })
-  //     .catch((err) => {
-  //       toast.error(err || "Failed to add item to cart");
-  //     });
-
-  //   router.push("/checkout");
-  // };
-
   const handleAddToCart = async () => {
     if (!selectedVariant) {
       toast.error("Please select a variant before adding to cart.");
@@ -122,12 +87,12 @@ export default function ProductDetailPage() {
 
     try {
       if (userId) {
-        // Call your redux addToCart
+        
         await dispatch(
           addToCart({
             userId,
             productId: product._id,
-            // variantId: selectedVariant._id,
+            
             variantId:
               product.variants && product.variants.length > 0
                 ? selectedVariant._id
@@ -137,7 +102,7 @@ export default function ProductDetailPage() {
         ).unwrap();
         toast.success("Item added to cart successfully!");
       } else {
-        // Fallback for guest (localStorage cart)
+        
         const storedCart = JSON.parse(localStorage.getItem("addToCart")) || [];
         const existingIndex = storedCart.findIndex(
           (item) => item._id === product._id

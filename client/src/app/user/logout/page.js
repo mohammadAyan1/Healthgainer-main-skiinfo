@@ -16,6 +16,7 @@ const Logout = () => {
         localStorage.removeItem("token"); // remove token if needed
         localStorage.removeItem("guestId"); // remove token if needed
         localStorage.removeItem("addToCart"); // remove token if needed
+        localStorage.removeItem("guestId"); // remove token if needed
 
         await dispatch(logout()).unwrap();
         dispatch(clearUser());

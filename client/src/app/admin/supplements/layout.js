@@ -128,7 +128,7 @@ export default function SupplementTable() {
   };
 
   const handleSubmit = async () => {
-    // Refresh already handled via slice
+    
   };
 
   const handleDragEnd = async (event) => {

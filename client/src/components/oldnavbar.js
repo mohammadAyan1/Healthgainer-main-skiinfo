@@ -20,7 +20,7 @@ export default function Navbar() {
   const router = useRouter();
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.auth?.user?.user) || null;
-  console.log(currentUser);
+  
 
   const [user, setUser] = useState(null); // State to store user data
 
@@ -54,10 +54,10 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  // Function to check if a link is active
+  
   const isActive = (href) => pathname === href;
 
-  // Function to handle profile click
+  
   const handleProfileClick = () => {
     if (user) {
       router.push('/user'); // Redirect to user profile

@@ -82,18 +82,15 @@ export default function EditProduct() {
           formDataToSend.append("newImages", file);
         });
 
-        console.log(
-          "Sending data:",
-          Object.fromEntries(formDataToSend.entries())
-        );
+       
 
         const response = await dispatch(updateProduct(formDataToSend)).unwrap();
-        console.log("API Response:", response);
+        
 
         (await toast).success("Product updated successfully!");
         router.push("/admin/products");
       } catch (error) {
-        console.error("Error updating product:", error);
+        
         (await toast).error(error || "Failed to update product.");
       } finally {
         setIsSubmitting(false);

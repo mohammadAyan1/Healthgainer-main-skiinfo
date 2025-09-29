@@ -1,6 +1,6 @@
 import axios from "axios";
 const API = axios.create({
-  // baseURL: "https://healthgainer-main.onrender.com/api/v1",
+  
 
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   headers: {

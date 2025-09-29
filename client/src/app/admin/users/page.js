@@ -7,7 +7,7 @@ import { getAllUsers, updateUser, deleteUser } from "@/redux/slices/authSlice";
 export default function Users() {
   const dispatch = useDispatch();
   const  users = useSelector((state) => state?.auth?.users || []);
-  console.log(users);
+  
   
   const {  loading } = useSelector((state) => state?.auth || []);
   

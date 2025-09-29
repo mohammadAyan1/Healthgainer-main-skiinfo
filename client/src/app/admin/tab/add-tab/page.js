@@ -62,7 +62,7 @@ const HealthGainerForm = () => {
       await dispatch(createHealthGainer(formattedData)).unwrap();
       setSubmissionSuccess(true);
       
-      // Reset form after successful submission
+      
       setFormData({
         product: "",
         description: "",

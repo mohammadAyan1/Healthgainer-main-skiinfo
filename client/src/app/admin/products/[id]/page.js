@@ -118,7 +118,7 @@ export default function ProductDetails() {
       setVariantToDelete(null);
       dispatch(fetchProductById(id));
     } catch (error) {
-      console.error("Error deleting variant:", error);
+      
       alert("Failed to delete variant.");
     }
   }, [dispatch, id]);

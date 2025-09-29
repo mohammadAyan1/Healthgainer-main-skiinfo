@@ -1,9 +1,9 @@
-// const { default: axios } = require("axios");
+
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const express = require("express");
-// const OTP = require("../routes/OTP");
+
 const axios = require("axios");
 
 const isProd = process.env.NODE_ENV === "production";
@@ -26,7 +26,7 @@ exports.getOTP = async (req, res) => {
       $or: [{ email }, { mobileNumber }],
     });
 
-    console.log(userExists);
+    // console.log(userExists);
 
     if (userExists) {
       if (userExists.email === email) {
@@ -82,7 +82,7 @@ exports.registerUser = async (req, res) => {
   try {
     const { firstName, lastName, mobileNumber, email, password } = req.body;
 
-    console.log(req.body, "HEELOREgister");
+    // console.log(req.body, "HEELOREgister");
 
     if (!email || !mobileNumber) {
       return res
@@ -95,7 +95,7 @@ exports.registerUser = async (req, res) => {
       $or: [{ email }, { mobileNumber }],
     });
 
-    console.log(userExists);
+    // console.log(userExists);
 
     if (userExists) {
       if (userExists.email === email) {
@@ -131,7 +131,7 @@ exports.registerUser = async (req, res) => {
       }
     );
 
-    console.log("Generated Token:", token); // Debugging log
+    
 
     // ✅ Cookies (env-aware)
     const cookieExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -145,7 +145,7 @@ exports.registerUser = async (req, res) => {
     res.cookie("token", token, { ...commonCookie, httpOnly: true });
     res.cookie("role", newUser.role, { ...commonCookie });
 
-    console.log("Cookies Set:", { token, role: newUser.role }); // Debugging log
+    // console.log("Cookies Set:", { token, role: newUser.role }); // Debugging log
 
     res.status(201).json({
       message: "User Registered Successfully",
@@ -161,7 +161,7 @@ exports.registerUser = async (req, res) => {
 
 exports.getOTPLogin = async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
 
     const { phone } = req.body;
     if (!phone) {
@@ -215,7 +215,7 @@ exports.getOTPLogin = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
   try {
-    console.log(req.body);
+    
 
     const { phone } = req.body.loginForm;
     if (!phone) {
@@ -238,7 +238,7 @@ exports.loginUser = async (req, res) => {
       }
     );
 
-    console.log("Generated Token:", token); // Debugging log
+    
 
     // ✅ Cookies (env-aware)
     const cookieExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -252,7 +252,7 @@ exports.loginUser = async (req, res) => {
     res.cookie("token", token, { ...commonCookie, httpOnly: true });
     res.cookie("role", user.role, { ...commonCookie });
 
-    console.log("Cookies Set:", { token, role: user.role }); // Debugging log
+    
 
     res.status(200).json({
       message: "Login Successful",
@@ -289,7 +289,7 @@ exports.logoutUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { id, role } = req.body;
-    console.log(id, role);
+    // console.log(id, role);
 
     const userId = id;
 
@@ -310,7 +310,7 @@ exports.updateUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const userId = req.body.id;
-    console.log(userId);
+    // console.log(userId);
 
     await User.findByIdAndDelete(userId);
     res
@@ -360,10 +360,10 @@ exports.todayLogins = async (req, res) => {
 exports.changePassword = async (req, res) => {
   try {
     const id = req.id;
-    console.log(id, "id");
+    
 
     const { newPassword, oldPassword } = req.body;
-    console.log(req.body, "req.body");
+    
     const currentPassword = oldPassword;
     const password = newPassword;
 
@@ -397,7 +397,7 @@ exports.updateUserDetails = async (req, res) => {
   try {
     const id = req.id;
     const { email, firstName, lastName, mobileNumber, role } = req.body;
-    console.log(id, role);
+    
 
     const userId = id;
 

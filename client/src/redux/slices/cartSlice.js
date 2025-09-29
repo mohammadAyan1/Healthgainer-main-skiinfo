@@ -5,13 +5,10 @@ import API from "../../lib/api";
 export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
   async (userId, { rejectWithValue }) => {
-    console.log(userId);
-
     try {
       const response = await API.get(`/cart?userId=${userId}`);
-      console.log(response);
 
-      return response.data.cart[0]?.items || [];
+      return response.data.cart?.items || [];
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error fetching cart");
     }
@@ -40,12 +37,32 @@ export const addToCart = createAsyncThunk(
   }
 );
 
+export const updateCartGuestIdToUserId = createAsyncThunk(
+  "cart/addToCart",
+  async ({ GuestIdCheck, UserId }, { rejectWithValue }) => {
+    try {
+      const response = await API.put(`/cart/updateguestidtouserid`, {
+        GuestIdCheck,
+        UserId,
+      });
+
+      return response.data || [];
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Error updating  cart");
+    }
+  }
+);
+
 // Remove item
 export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
-  async ({ userId, itemId }, { rejectWithValue }) => {
+  async ({ userId, guestId, itemId }, { rejectWithValue }) => {
     try {
-      const response = await API.post(`/cart/remove`, { userId, itemId });
+      const response = await API.post(`/cart/remove`, {
+        userId,
+        guestId,
+        itemId,
+      });
       return response.data.cart.items || [];
     } catch (error) {
       return rejectWithValue(
@@ -58,10 +75,11 @@ export const removeFromCart = createAsyncThunk(
 // Update quantity
 export const updateCartQuantity = createAsyncThunk(
   "cart/updateCartQuantity",
-  async ({ userId, itemId, quantity }, { rejectWithValue }) => {
+  async ({ userId, guestId, itemId, quantity }, { rejectWithValue }) => {
     try {
       const response = await API.post(`/cart/update`, {
         userId,
+        guestId,
         itemId,
         quantity,
       });

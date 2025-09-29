@@ -1,4 +1,4 @@
-// routes/benefitRoutes.js
+
 const express = require("express");
 const { getAllMediaReports,
 

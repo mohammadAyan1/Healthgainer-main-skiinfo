@@ -4,7 +4,7 @@ const Address = require('../models/addressModel');
 exports.addAddress = async (req, res) => {
   try {
     const userId = req.id;
-    console.log(userId, "userId");
+    
     
     const {  fullName, phone, street, city, state, zipCode, country, isDefault } = req.body;
 
@@ -89,8 +89,7 @@ exports.getAddressById = async (req, res) => {
 exports.updateAddress = async (req, res) => {
   try {
     const { addressId } = req.params;
-    console.log(addressId, "addressId");
-    console.log(req.body, "req.body");
+    
     
     
     const { fullName, phone, street, city, state, zipCode, country, isDefault } = req.body;

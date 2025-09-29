@@ -17,5 +17,9 @@ router.post("/update", cartController.updateCartItemQuantity);
 
 // EMpty all the card
 router.post("/empty", cartController.emptyCart);
+//update guest cart to user cart
+router.put("/updateguestidtouserid", cartController.updateCartGuestIdToUserId);
+
+
 
 module.exports = router;

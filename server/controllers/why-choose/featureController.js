@@ -34,9 +34,9 @@ exports.getAllFeatures = async (req, res) => {
 };
 
 exports.updateFeature = async (req, res) => {
-    console.log("updating..")
+    
   try {
-    console.log(req.body)
+    
     const { id } = req.params;
     const { title, description } = req.body;
     const updateData = { title, description };
@@ -50,7 +50,7 @@ exports.updateFeature = async (req, res) => {
       updateData.imageUrl = upload.url;
     }
     const updated = await Feature.findByIdAndUpdate(id, updateData, { new: true });
-    console.log(updated)
+    
     res.status(200).json({ success: true, feature: updated });
   } catch (err) {
     console.error("Update feature error:", err);

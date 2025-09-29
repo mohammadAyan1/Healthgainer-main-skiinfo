@@ -52,7 +52,7 @@ export default function EditVariant() {
     variant: state.variant?.variant || {}
   }));
 
-  console.log("Fetched Variant Data:", variants);
+  
 
   const initialFormState = useMemo(() => ({
     weight: "",

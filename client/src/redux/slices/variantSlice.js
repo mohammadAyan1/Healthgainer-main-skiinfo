@@ -19,7 +19,7 @@ export const createVariant = createAsyncThunk(
 );
 
 export const updateVariant = createAsyncThunk("variant/updateVariant", async ({ productId,variantId, updatedData }) => {
-  console.log(productId,variantId, updatedData );
+  
   
   const response = await API.put(`/variants/${productId}/${variantId}`, updatedData ,{
     headers: {
@@ -30,7 +30,7 @@ export const updateVariant = createAsyncThunk("variant/updateVariant", async ({ 
 });
 
 export const deleteVariant = createAsyncThunk("variant/deleteVariant", async (id) => {
-  console.log(id);
+  
   
   await API.delete(`/variants/${id.productId}/${id.variantId}`);
   return id.variantId;

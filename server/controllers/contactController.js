@@ -8,10 +8,7 @@ exports.createContact = async (req, res) => {
     if (!name || !email) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    // if (!message && !phone) {
-    //   return res.status(400).json({ message: 'At least one field (email or phone) is required' });
-    // }
-    // Create a new contact instance
+   
     const newContact = new Contact({
       name,
       message,
@@ -40,10 +37,7 @@ exports.getAllContacts = async (req, res) => {
     // Fetch all contacts
     const contacts = await Contact.find().sort({ createdAt: -1 });
 
-    console.log(
-      contacts.map((r) => r.createdAt),
-      "contact controller"
-    );
+   
     return res.status(200).json(contacts);
   } catch (error) {
     console.error(error);

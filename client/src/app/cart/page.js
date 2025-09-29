@@ -20,15 +20,15 @@ import { useDispatch, useSelector } from "react-redux";
 export default function CartPage() {
   const dispatch = useDispatch();
   const router = useRouter();
-  // const cartItems = useSelector((state) => state.cart.items || []);
+
   const cartItems = useSelector((state) => state.cart.items || []);
 
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
+    let guestId;
     if (!user?._id) {
-      let guestId = localStorage.getItem("guestId");
-      console.log(guestId);
+      guestId = localStorage.getItem("guestId");
     }
 
     if (user?._id) {
@@ -40,12 +40,40 @@ export default function CartPage() {
 
   const updateQuantity = (itemId, quantity) => {
     if (quantity > 0) {
-      dispatch(updateCartQuantity({ userId: user._id, itemId, quantity }));
+      let payload = { itemId, quantity };
+
+      if (user?._id) {
+        // Logged in user
+        payload.userId = user._id;
+      } else {
+        // Guest user
+        const guestId = localStorage.getItem("guestId");
+        if (!guestId) {
+          console.error("No guestId found in localStorage");
+          return;
+        }
+        payload.guestId = guestId;
+      }
+
+      dispatch(updateCartQuantity(payload));
     }
   };
 
   const removeItem = (itemId) => {
-    dispatch(removeFromCart({ userId: user._id, itemId }));
+    let payload = { itemId };
+
+    if (user?._id) {
+      payload.userId = user?._id;
+    } else {
+      const guestId = localStorage.getItem("guestId");
+      if (!guestId) {
+        console.error("No guestId found in localStorage");
+        return;
+      }
+      payload.guestId = guestId;
+    }
+
+    dispatch(removeFromCart({ payload }));
   };
 
   const calculateTotal = () =>
@@ -59,12 +87,11 @@ export default function CartPage() {
       0
     ) || 0;
 
-  // const calculateItemCount = () =>
-  //   (cartItems || [])?.reduce((count, item) => count + (item.quantity || 0), 0);
   const calculateItemCount = () =>
     (cartItems || []).reduce((count, item) => count + (item.quantity || 0), 0);
 
-  // console.log(cartItems);
+  console.log(user);
+  console.log(cartItems);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">

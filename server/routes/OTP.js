@@ -16,8 +16,7 @@ routes.post("/", async (req, res) => {
       });
     }
 
-    console.log(phone);
-    console.log(req.body, "this is body");
+    
 
     const otpNumber = Math.floor(1000 + Math.random() * 9000);
 
@@ -46,14 +45,14 @@ routes.post("/", async (req, res) => {
       Data: otpNumber,
     });
   } catch (error) {
-    console.log(error);
+    
   }
 });
 
 routes.post("/resend", async (req, res) => {
   try {
     const { phone, OTPNumber } = req.body;
-    console.log(req.body);
+    
 
     if (!phone) {
       res.status(405).json({
@@ -62,10 +61,7 @@ routes.post("/resend", async (req, res) => {
         Data: null,
       });
     }
-    // console.log(phone);
-    console.log(req.body, "this is body");
-
-    // const otpNumber = Math.floor(1000 + Math.random() * 9000);
+  
 
     const response = await axios.get(url, {
       params: {
@@ -92,7 +88,7 @@ routes.post("/resend", async (req, res) => {
       Data: OTPNumber,
     });
   } catch (error) {
-    console.log(error);
+    
   }
 });
 

@@ -117,7 +117,7 @@ export default function Orders() {
       await dispatch(updateOrderStatus({ orderId, status: newStatus }));
       dispatch(allOrders());
     } catch (error) {
-      console.error("Failed to update order status:", error);
+      
     }
   }, [dispatch]);
 

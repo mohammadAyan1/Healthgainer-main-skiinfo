@@ -127,7 +127,7 @@ app.use("/api/v1/why/features", featureRoutes);
 app.use("/api/v1/why/advantages", advantagesRoutes);
 app.use("/api/v1/mediaReports", mediaReportRoutes);
 
-// app.use("/api/payment", paymentRout
+
 app.use("/api/v1/payment", paymentRoutes);
 
 
@@ -142,11 +142,11 @@ app.all("*", (req, res, next) => {
 connectDB()
   .then(() => {
     app.listen(port, () => {
-      console.log(`Server listening at port ${port}`);
+      
     });
   })
   .catch((error) => {
     console.error("Failed to connect to the database:", error);
   });
 
-// /api/v1/images
+

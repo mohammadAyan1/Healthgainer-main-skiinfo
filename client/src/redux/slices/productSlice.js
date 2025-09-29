@@ -3,7 +3,7 @@ import API from "../../lib/api";
 export const createProduct = createAsyncThunk(
   "product/create",
   async (productData, { rejectWithValue }) => {
-    console.log(productData);
+    
 
     try {
       const response = await API.post(`/products/`, productData, {
@@ -43,9 +43,9 @@ export const deleteProduct = createAsyncThunk(
 export const updateProduct = createAsyncThunk(
   "product/update",
   async (updatedProduct, { rejectWithValue }) => {
-    console.log("FormData contents:");
+    
     for (let [key, value] of updatedProduct.entries()) {
-      console.log(key, value);
+      
     }
 
     try {

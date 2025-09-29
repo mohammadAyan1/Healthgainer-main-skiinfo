@@ -86,7 +86,7 @@ exports.placeOrder = async (req, res) => {
 
     await order.save();
 
-    // console.log(order, "order place controller");
+    
 
     // ✅ Return Razorpay order details to frontend
     res.status(201).json({
@@ -95,97 +95,16 @@ exports.placeOrder = async (req, res) => {
       orderId: order._id,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
-// exports.placeOrder = async (req, res) => {
-//   const id = req.id;
-//   const userId = id;
-
-//   try {
-//     const { addressId, paymentMethod, note } = req.body;
-
-//     let cart = await Cart.findOne({ userId }).populate({
-//       path: "items.productId",
-//       model: "Product",
-//     });
-
-//     if (!cart || cart.items.length === 0) {
-//       return res
-//         .status(400)
-//         .json({ success: false, message: "Cart is empty!" });
-//     }
-
-//     const address = await Address.findById(addressId);
-//     if (!address) {
-//       return res
-//         .status(404)
-//         .json({ success: false, message: "Address not found" });
-//     }
-
-//     let totalAmount = cart.items.reduce((acc, item) => {
-//       const product = item.productId;
-//       const variant = product.variants.find(
-//         (v) => v._id.toString() === item.variantId.toString()
-//       );
-
-//       if (!variant) {
-//         throw new Error(`Variant not found for product: ${product.name}`);
-//       }
-
-//       const price = variant.price || product.price;
-//       return acc + item.quantity * price;
-//     }, 0);
-
-//     // 🔹 **Generate Unique `orderId` (HG + 4 Random Digits)**
-//     const randomNum = Math.floor(1000 + Math.random() * 9000); // 1000-9999
-//     const newOrderId = `HG${randomNum}`;
-
-//     // 🔹 **Generate Incremental `orderNumber`**
-//     const lastOrder = await Order.findOne().sort({ orderNumber: -1 }); // Get last order
-//     const newOrderNumber = lastOrder ? lastOrder.orderNumber + 1 : 101; // Start from 101
-
-//     const order = new Order({
-//       orderId: newOrderId, // ✅ Random Unique ID
-//       orderNumber: newOrderNumber, // ✅ Incremental Order Number
-//       userId,
-//       items: cart.items.map((item) => ({
-//         productId: item.productId._id,
-//         variantId: item.variantId,
-//         quantity: item.quantity,
-//         price:
-//           item.productId.variants.find(
-//             (v) => v._id.toString() === item.variantId.toString()
-//           )?.price || item.productId.price,
-//       })),
-//       totalAmount,
-//       address: addressId,
-//       note,
-//       paymentMethod,
-//       paymentStatus: paymentMethod === "COD" ? "Pending" : "Paid",
-//     });
-
-//     await order.save();
-
-//     await Cart.findOneAndDelete({ userId });
-
-//     res
-//       .status(201)
-//       .json({ success: true, message: "Order placed successfully!", order });
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
-
-// ✅ Get Orders for a User
 
 exports.getOrders = async (req, res) => {
   const id = req.id;
   const userId = id;
   try {
-    // const { userId } = req.params;
+    
     const orders = await Order.find({ userId })
       .populate("address") // Address details populate karein
       .sort({ createdAt: -1 });
@@ -200,10 +119,7 @@ exports.getOrderById = async (req, res) => {
     const { orderId } = req.params;
     const order = await Order.findById(orderId);
 
-    console.log(order, "get order by id");
-
-    // .populate("address") // Address details populate karein
-    // .populate("items.productId"); // Product details populate karein
+   
     if (!order) {
       return res
         .status(404)
@@ -390,14 +306,14 @@ exports.getOrdersByUser = async (req, res) => {
 };
 
 exports.newOrderNotifications = (req, res) => {
-  console.log("🔹 [SSE] Request received for new order notifications.");
+  
 
   try {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
-    console.log("✅ [SSE] Client connected successfully.");
+    
     const connectionType =
       mongoose.connection?.db?.topology?.s?.descriptionType;
 
@@ -416,15 +332,15 @@ exports.newOrderNotifications = (req, res) => {
     const changeStream = Order.watch();
 
     changeStream.on("change", (change) => {
-      console.log("🔄 [SSE] Database Change Detected:", change);
+      
 
       if (change.operationType === "insert") {
         const newOrder = change.fullDocument;
-        console.log("🆕 [SSE] New Order Inserted:", newOrder);
+        
 
         try {
           res.write(`data: ${JSON.stringify(newOrder)}\n\n`);
-          console.log("📡 [SSE] Data sent to client.");
+          
         } catch (err) {
           console.error("❌ [SSE] Error writing data to client:", err);
         }
@@ -433,7 +349,7 @@ exports.newOrderNotifications = (req, res) => {
 
     // Har 25 sec me keep-alive ping bhejo
     const keepAliveInterval = setInterval(() => {
-      console.log("🔄 [SSE] Sending keep-alive ping...");
+      
       try {
         res.write("data: {}\n\n");
       } catch (err) {
@@ -443,12 +359,12 @@ exports.newOrderNotifications = (req, res) => {
 
     // Client disconnect handle karein
     req.on("close", () => {
-      console.log("❌ [SSE] Client disconnected.");
+      
       clearInterval(keepAliveInterval);
       changeStream
         .close()
         .then(() => {
-          console.log("🔒 [SSE] Change stream closed.");
+          
         })
         .catch((err) => {
           console.error("❌ [SSE] Error closing change stream:", err);

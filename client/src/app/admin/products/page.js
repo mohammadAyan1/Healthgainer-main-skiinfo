@@ -177,7 +177,7 @@ export default function Products() {
 
     try {
       const result = await dispatch(deleteProduct(productId));
-      console.log(result);
+      
 
       if (deleteProduct.fulfilled.match(result)) {
         toast.success("Product deleted successfully");
