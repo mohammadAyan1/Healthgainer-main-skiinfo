@@ -7,6 +7,8 @@ const express = require("express");
 const axios = require("axios");
 
 const isProd = process.env.NODE_ENV === "production";
+console.log(false);
+
 
 const app = express();
 
@@ -15,7 +17,7 @@ exports.getOTP = async (req, res) => {
   try {
     const { firstName, lastName, mobileNumber, email, password } = req.body;
 
-    if (!email || !mobileNumber) {
+    if ( !mobileNumber) {
       return res
         .status(400)
         .json({ message: "All fields are required", success: false });
@@ -84,7 +86,7 @@ exports.registerUser = async (req, res) => {
 
     // console.log(req.body, "HEELOREgister");
 
-    if (!email || !mobileNumber) {
+    if (!mobileNumber) {
       return res
         .status(400)
         .json({ message: "All fields are required", success: false });

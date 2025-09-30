@@ -37,7 +37,9 @@ const DashboardLayout = ({ children }) => {
     { href: "/user/user-orders", label: "My Orders", icon: <FiShoppingBag className="mr-3" /> },
     { href: "/user/address", label: "My Address", icon: <FiMapPin className="mr-3" /> },
     { href: "/user/account-details", label: "Account Details", icon: <FiUser className="mr-3" /> },
-    { href: "/user/change-password", label: "Change Password", icon: <FiLock className="mr-3" /> },
+    // { href: "/user/change-password", label: "Change Password", icon: <FiLock className="mr-3" /> },
+    { href: "/", label: "Home", icon: <FiHome className="mr-3" /> },
+
   ];
 
   return (

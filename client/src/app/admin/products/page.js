@@ -6,45 +6,120 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 
 const SearchIcon = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+  <svg
+    className="w-4 h-4"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+    />
   </svg>
 );
 
 const PlusIcon = () => (
-  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+  <svg
+    className="w-4 h-4 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M12 4v16m8-8H4"
+    />
   </svg>
 );
 
 const DownloadIcon = () => (
-  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+  <svg
+    className="w-4 h-4 mr-2"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+    />
   </svg>
 );
 
 const SortIcon = () => (
-  <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+  <svg
+    className="w-3 h-3 ml-1"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+    />
   </svg>
 );
 
 const EyeIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+  <svg
+    className="w-5 h-5"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+    />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+    />
   </svg>
 );
 
 const EditIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+  <svg
+    className="w-5 h-5"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+    />
   </svg>
 );
 
 const TrashIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+  <svg
+    className="w-5 h-5"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+    />
   </svg>
 );
 
@@ -56,9 +131,16 @@ const TableHeader = ({ label, sortKey, onSort, sortConfig }) => (
   </th>
 );
 
-const ActionButton = ({ href, onClick, icon: Icon, color, label, className = "" }) => {
+const ActionButton = ({
+  href,
+  onClick,
+  icon: Icon,
+  color,
+  label,
+  className = "",
+}) => {
   const buttonClass = `${color} transition-colors p-1 rounded hover:bg-opacity-10 ${className}`;
-  
+
   if (href) {
     return (
       <Link href={href}>
@@ -68,7 +150,7 @@ const ActionButton = ({ href, onClick, icon: Icon, color, label, className = "" 
       </Link>
     );
   }
-  
+
   return (
     <button aria-label={label} className={buttonClass} onClick={onClick}>
       <Icon />
@@ -92,13 +174,13 @@ const ProductRow = ({ product, onDelete }) => (
     <td className="p-3">₹{product.mrp}</td>
     <td className="p-3">₹{product.price}</td>
     <td className="p-3">{product.stock}</td>
-    <td className="p-3">
+    {/* <td className="p-3">
       <Link href={`/admin/add-variant/${product._id}`}>
         <button className="text-blue-500 hover:text-blue-700 transition-colors">
           Add Variant
         </button>
       </Link>
-    </td>
+    </td> */}
     <td className="p-3">
       <div className="flex items-center space-x-2">
         <ActionButton
@@ -130,7 +212,11 @@ export default function Products() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const dispatch = useDispatch();
-  const { products: productsData, loading, error } = useSelector((state) => state.product);
+  const {
+    products: productsData,
+    loading,
+    error,
+  } = useSelector((state) => state.product);
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -162,54 +248,64 @@ export default function Products() {
   const totalPages = Math.ceil(processedProducts.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentProducts = processedProducts.slice(indexOfFirstItem, indexOfLastItem);
+  const currentProducts = processedProducts.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
   const handleSort = useCallback((key) => {
-    setSortConfig(prev => ({
+    setSortConfig((prev) => ({
       key,
-      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc"
+      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
     }));
   }, []);
 
-  const handleDelete = useCallback(async (productId) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this product?");
-    if (!confirmDelete) return;
+  const handleDelete = useCallback(
+    async (productId) => {
+      const confirmDelete = window.confirm(
+        "Are you sure you want to delete this product?"
+      );
+      if (!confirmDelete) return;
 
-    try {
-      const result = await dispatch(deleteProduct(productId));
-      
+      try {
+        const result = await dispatch(deleteProduct(productId));
 
-      if (deleteProduct.fulfilled.match(result)) {
-        toast.success("Product deleted successfully");
-        dispatch(fetchProducts());
-      } else {
-        toast.error("Failed to delete product");
+        if (deleteProduct.fulfilled.match(result)) {
+          toast.success("Product deleted successfully");
+          dispatch(fetchProducts());
+        } else {
+          toast.error("Failed to delete product");
+        }
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        toast.error("Something went wrong while deleting");
       }
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      toast.error("Something went wrong while deleting");
-    }
-  }, [dispatch]);
+    },
+    [dispatch]
+  );
 
   const handleSearchChange = useCallback((e) => {
     setSearchQuery(e.target.value);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   }, []);
 
   const handlePreviousPage = useCallback(() => {
-    setCurrentPage(prev => Math.max(prev - 1, 1));
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
   }, []);
 
   const handleNextPage = useCallback(() => {
-    setCurrentPage(prev => prev + 1);
+    setCurrentPage((prev) => prev + 1);
   }, []);
 
-  const tableHeaders = useMemo(() => [
-    { label: "Name", sortKey: "name" },
-    { label: "MRP", sortKey: "mrp" },
-    { label: "Price", sortKey: "price" },
-    { label: "Stock", sortKey: "stock" }
-  ], []);
+  const tableHeaders = useMemo(
+    () => [
+      { label: "Name", sortKey: "name" },
+      { label: "MRP", sortKey: "mrp" },
+      { label: "Price", sortKey: "price" },
+      { label: "Stock", sortKey: "stock" },
+    ],
+    []
+  );
 
   if (loading) {
     return (
@@ -283,7 +379,7 @@ export default function Products() {
                     sortConfig={sortConfig}
                   />
                 ))}
-                <th className="p-3 text-left">Add Variant</th>
+                {/* <th className="p-3 text-left">Add Variant</th> */}
                 <th className="p-3 text-left">Actions</th>
               </tr>
             </thead>
@@ -299,7 +395,9 @@ export default function Products() {
               ) : (
                 <tr>
                   <td colSpan="6" className="p-6 text-center text-gray-500">
-                    {searchQuery ? "No products found matching your search." : "No products found"}
+                    {searchQuery
+                      ? "No products found matching your search."
+                      : "No products found"}
                   </td>
                 </tr>
               )}
@@ -310,9 +408,11 @@ export default function Products() {
 
       <div className="flex flex-col md:flex-row justify-between items-center mt-4 gap-4">
         <div className="text-sm text-gray-600">
-          Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, processedProducts.length)} of {processedProducts.length} products
+          Showing {indexOfFirstItem + 1} to{" "}
+          {Math.min(indexOfLastItem, processedProducts.length)} of{" "}
+          {processedProducts.length} products
         </div>
-        
+
         <div className="flex space-x-2">
           <button
             onClick={handlePreviousPage}

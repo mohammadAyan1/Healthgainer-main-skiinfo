@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   FaTrash,
   FaPlus,
@@ -21,7 +21,10 @@ export default function CartPage() {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const cartItems = useSelector((state) => state.cart.items || []);
+  // const cartItems = useSelector((state) => state.cart.items || []);
+  const cartItems = useSelector((state) =>
+    Array.isArray(state.cart.items) ? state.cart.items : []
+  );
 
   const user = useSelector((state) => state.auth.user);
 
@@ -63,9 +66,11 @@ export default function CartPage() {
     let payload = { itemId };
 
     if (user?._id) {
-      payload.userId = user?._id;
+      payload.userId = user._id;
     } else {
       const guestId = localStorage.getItem("guestId");
+      console.log(guestId);
+
       if (!guestId) {
         console.error("No guestId found in localStorage");
         return;
@@ -73,22 +78,54 @@ export default function CartPage() {
       payload.guestId = guestId;
     }
 
-    dispatch(removeFromCart({ payload }));
+    dispatch(removeFromCart(payload));
   };
 
+  const emptyCartHandler = () => {
+    console.log("qwertyuiop");
+
+    let payload = {};
+
+    if (user?._id) {
+      payload.userId = user._id;
+    } else {
+      payload.guestId = localStorage.getItem("guestId");
+    }
+
+    dispatch(emptyCart(payload));
+  };
+
+  // const calculateTotal = () =>
+  //   cartItems.reduce((total, item) => total + item.price * item.quantity, 0) ||
+  //   0;
+
   const calculateTotal = () =>
-    cartItems.reduce((total, item) => total + item.price * item.quantity, 0) ||
-    0;
+    Array.isArray(cartItems)
+      ? cartItems.reduce(
+          (total, item) => total + (item.price || 0) * (item.quantity || 0),
+          0
+        )
+      : 0;
+
+  // const calculateSavings = () =>
+  //   cartItems.reduce(
+  //     (total, item) =>
+  //       total + ((item.mrp || 0) - (item.price || 0)) * (item.quantity || 0),
+  //     0
+  //   ) || 0;
 
   const calculateSavings = () =>
-    cartItems.reduce(
-      (total, item) =>
-        total + ((item.mrp || 0) - (item.price || 0)) * (item.quantity || 0),
-      0
-    ) || 0;
+    Array.isArray(cartItems)
+      ? cartItems.reduce(
+          (total, item) =>
+            total +
+            ((item.mrp || 0) - (item.price || 0)) * (item.quantity || 0),
+          0
+        )
+      : 0;
 
   const calculateItemCount = () =>
-    (cartItems || []).reduce((count, item) => count + (item.quantity || 0), 0);
+    (cartItems || [])?.reduce((count, item) => count + (item.quantity || 0), 0);
 
   console.log(user);
   console.log(cartItems);
@@ -129,7 +166,8 @@ export default function CartPage() {
                 <div className="p-4 border-b flex justify-between items-center">
                   <h2 className="text-lg font-medium">Cart Items</h2>
                   <button
-                    onClick={() => dispatch(emptyCart(user._id))}
+                    //onClick={() => dispatch(emptyCart(user._id))}
+                    onClick={() => emptyCartHandler()}
                     className="text-sm text-red-600 hover:text-red-800 font-medium"
                   >
                     Empty Cart

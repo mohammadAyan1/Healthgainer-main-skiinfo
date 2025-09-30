@@ -26,9 +26,13 @@ const dealSchema = new mongoose.Schema(
       required: true,
     },
     sno: {
-  type: Number,
-  required: true,
-}
+      type: Number,
+      required: true,
+    },
+    type: {
+      type: String,
+      default: "viewplan",
+    },
   },
   { timestamps: true }
 );

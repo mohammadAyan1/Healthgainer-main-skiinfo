@@ -23,8 +23,15 @@ const orderSchema = new mongoose.Schema(
         productId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
-          required: true,
+          // required: true,
         },
+        dealOfTheDay: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Deal",
+          // required: true,
+        },
+        title: String, // ✅ for deals
+        subtitle: String, // ✅ for deals
         variantId: { type: mongoose.Schema.Types.ObjectId, required: false },
         quantity: { type: Number, required: true },
         price: { type: Number, required: true },

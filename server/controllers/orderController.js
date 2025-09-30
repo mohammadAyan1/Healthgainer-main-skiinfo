@@ -86,8 +86,6 @@ exports.placeOrder = async (req, res) => {
 
     await order.save();
 
-    
-
     // ✅ Return Razorpay order details to frontend
     res.status(201).json({
       success: true,
@@ -104,7 +102,6 @@ exports.getOrders = async (req, res) => {
   const id = req.id;
   const userId = id;
   try {
-    
     const orders = await Order.find({ userId })
       .populate("address") // Address details populate karein
       .sort({ createdAt: -1 });
@@ -117,9 +114,11 @@ exports.getOrders = async (req, res) => {
 exports.getOrderById = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId)
+      .populate("userId")
+      .populate("items.productId")
+      .populate("items.dealOfTheDay");
 
-   
     if (!order) {
       return res
         .status(404)
@@ -306,14 +305,11 @@ exports.getOrdersByUser = async (req, res) => {
 };
 
 exports.newOrderNotifications = (req, res) => {
-  
-
   try {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
-    
     const connectionType =
       mongoose.connection?.db?.topology?.s?.descriptionType;
 
@@ -332,15 +328,11 @@ exports.newOrderNotifications = (req, res) => {
     const changeStream = Order.watch();
 
     changeStream.on("change", (change) => {
-      
-
       if (change.operationType === "insert") {
         const newOrder = change.fullDocument;
-        
 
         try {
           res.write(`data: ${JSON.stringify(newOrder)}\n\n`);
-          
         } catch (err) {
           console.error("❌ [SSE] Error writing data to client:", err);
         }
@@ -349,7 +341,6 @@ exports.newOrderNotifications = (req, res) => {
 
     // Har 25 sec me keep-alive ping bhejo
     const keepAliveInterval = setInterval(() => {
-      
       try {
         res.write("data: {}\n\n");
       } catch (err) {
@@ -359,13 +350,10 @@ exports.newOrderNotifications = (req, res) => {
 
     // Client disconnect handle karein
     req.on("close", () => {
-      
       clearInterval(keepAliveInterval);
       changeStream
         .close()
-        .then(() => {
-          
-        })
+        .then(() => {})
         .catch((err) => {
           console.error("❌ [SSE] Error closing change stream:", err);
         });

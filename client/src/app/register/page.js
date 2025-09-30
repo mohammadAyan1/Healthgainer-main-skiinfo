@@ -33,7 +33,6 @@ export default function RegisterPage() {
     setIsMounted(true);
   }, []);
 
-  
   useEffect(() => {
     if (error) {
       toast.error(error.message || "An error occurred");
@@ -63,15 +62,15 @@ export default function RegisterPage() {
       confirmPassword,
     } = registerForm;
 
-    if (!firstName.trim() || !mobileNumber.trim() || !email.trim()) {
+    if (!firstName.trim() || !mobileNumber.trim()) {
       toast.error("Please fill in all fields");
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      toast.error("Please enter a valid email address");
-      return;
-    }
+    // if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    //   toast.error("Please enter a valid email address");
+    //   return;
+    // }
 
     if (mobileNumber.trim().length !== 10 || isNaN(mobileNumber.trim())) {
       toast.error("Mobile number must be 10 digits");
@@ -82,15 +81,12 @@ export default function RegisterPage() {
     dispatch(getOTP({ firstName, lastName, email, mobileNumber, password }))
       .unwrap()
       .then((res) => {
-        
-
         if (res?.success) {
           setHideForm(true);
           setOTPNumber(res?.Data);
         }
 
         toast.success("OTP generated successfull");
-        
       })
       .catch((err) => {
         toast.error(err || "Registration failed");
@@ -224,7 +220,6 @@ export default function RegisterPage() {
                             lastName: e.target.value,
                           })
                         }
-                        
                       />
                     </div>
                   </div>
@@ -248,7 +243,7 @@ export default function RegisterPage() {
                           email: e.target.value,
                         })
                       }
-                      required
+                      // required
                     />
                   </div>
 

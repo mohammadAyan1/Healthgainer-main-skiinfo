@@ -81,6 +81,7 @@ exports.addToCart = async (req, res) => {
 exports.removeFromCart = async (req, res) => {
   try {
     const { userId, guestId, itemId } = req.body;
+    console.log(req.body);
 
     let filter = {};
     if (userId) {
@@ -93,7 +94,7 @@ exports.removeFromCart = async (req, res) => {
         .json({ success: false, message: "userId or guestId is required" });
     }
 
-    const cart = await Cart.findOne({ filter });
+    const cart = await Cart.findOne(filter);
     if (!cart)
       return res
         .status(404)
@@ -248,8 +249,13 @@ exports.updateCartGuestIdToUserId = async (req, res) => {
 };
 
 exports.emptyCart = async (req, res) => {
-  const { userId } = req.body;
-  let cart = await Cart.findOne({ userId });
+  const { userId,guestId } = req.body;
+  let filter = {}
+  if (userId) filter.userId = userId;
+  else if (guestId) filter.guestId = guestId;
+  else return res.status(400).json({success:false,message:"userId or guestId id required"});
+
+  let cart = await Cart.findOne(filter);
   if (!cart)
     return res.status(404).json({ success: false, message: "Cart not found" });
   cart.items = [];

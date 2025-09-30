@@ -37,17 +37,22 @@ export default function DealsOfTheDay() {
   const hotDealIndex = deals.findIndex((deal) => deal.tag === "HOT DEAL");
 
   const handleViewPlanClick = (deal) => {
-    if (user) {
-      const query = new URLSearchParams({
-        title: deal.title,
-        amount: deal.price,
-        quantity: deal.quantity,
-        subtitle: deal.subtitle,
-        type: "viewPlan",
-      }).toString();
+    console.log(deal);
 
-      router.push(`/checkout?${query}`);
+    const query = new URLSearchParams({
+      title: deal.title,
+      amount: deal.price,
+      quantity: deal.quantity,
+      subtitle: deal.subtitle,
+      type: "viewPlan",
+      productId: deal._id,
+    }).toString();
+
+    const targetRoute = `/checkout?${query}`;
+    if (user) {
+      router.push(targetRoute);
     } else {
+      localStorage.setItem("redirectAfterLogin", targetRoute);
       toast.warn("Please login to continue!", {
         position: "top-center",
         autoClose: 3000,
@@ -57,30 +62,30 @@ export default function DealsOfTheDay() {
   };
 
   if (loading || !deals.length) {
-    return <div className='text-center text-white py-10'>Loading deals...</div>;
+    return <div className="text-center text-white py-10">Loading deals...</div>;
   }
   const sortedDeals = [...deals].sort((a, b) => a.sno - b.sno);
 
   return (
-    <div className='bg-[#060606] py-10 px-4 md:px-20 overflow-hidden font-sans relative'>
-      <div className='mb-6 text-center'>
-        <h2 className='text-4xl px-4 md:text-5xl font-light py-2 text-white'>
-          Deal of the <span className='text-lime-500 font-bold'>Day</span>
+    <div className="bg-[#060606] py-10 px-4 md:px-20 overflow-hidden font-sans relative">
+      <div className="mb-6 text-center">
+        <h2 className="text-4xl px-4 md:text-5xl font-light py-2 text-white">
+          Deal of the <span className="text-lime-500 font-bold">Day</span>
         </h2>
       </div>
 
       <button
         ref={prevRef}
-        className='flex absolute left-2 top-1/2 z-10 -translate-y-1/2 bg-white p-3 rounded-full shadow-md hover:scale-110 transition-transform'
+        className="flex absolute left-2 top-1/2 z-10 -translate-y-1/2 bg-white p-3 rounded-full shadow-md hover:scale-110 transition-transform"
       >
-        <FaArrowLeft className='text-black w-5 h-5' />
+        <FaArrowLeft className="text-black w-5 h-5" />
       </button>
 
       <button
         ref={nextRef}
-        className='flex absolute right-2 top-1/2 z-10 -translate-y-1/2 bg-white p-3 rounded-full shadow-md hover:scale-110 transition-transform'
+        className="flex absolute right-2 top-1/2 z-10 -translate-y-1/2 bg-white p-3 rounded-full shadow-md hover:scale-110 transition-transform"
       >
-        <FaArrowRight className='text-black w-5 h-5' />
+        <FaArrowRight className="text-black w-5 h-5" />
       </button>
 
       <Swiper
@@ -111,7 +116,7 @@ export default function DealsOfTheDay() {
           768: { slidesPerView: 2.5 },
           1024: { slidesPerView: 3 },
         }}
-        className='w-full'
+        className="w-full"
       >
         {sortedDeals.map((deal, index) => {
           const isActive = activeIndex === index;
@@ -129,41 +134,41 @@ export default function DealsOfTheDay() {
                 } bg-[#151515] text-white cursor-pointer sm:min-h-[480px]`}
               >
                 {showHotDealTag && (
-                  <div className='bg-lime-500 text-black text-xs font-bold px-3 py-1 rounded-full inline-block shadow-md sm:mb-3'>
+                  <div className="bg-lime-500 text-black text-xs font-bold px-3 py-1 rounded-full inline-block shadow-md sm:mb-3">
                     {deal.tag}
                     {deal.quantity}
                   </div>
                 )}
 
-                <h3 className='text-base sm:text-2xl font-semibold sm:mb-1'>
+                <h3 className="text-base sm:text-2xl font-semibold sm:mb-1">
                   {deal.title}
                 </h3>
-                <p className='text-xs sm:text-sm text-yellow-400 text-gray-300'>
+                <p className="text-xs sm:text-sm text-yellow-400 text-gray-300">
                   {deal.subtitle}
                 </p>
-                <p className='text-xl sm:text-3xl font-bold text-lime-400'>
+                <p className="text-xl sm:text-3xl font-bold text-lime-400">
                   {deal.price}
                 </p>
-                <div className='flex justify-center items-center mb-3 sm:mb-4 gap-2'>
-                  <div className='relative w-60 h-28 sm:w-32 sm:h-32 overflow-hidden'>
+                <div className="flex justify-center items-center mb-3 sm:mb-4 gap-2">
+                  <div className="relative w-60 h-28 sm:w-32 sm:h-32 overflow-hidden">
                     <Image
                       src={deal.image || "/fallback.png"}
-                      alt='Deal'
+                      alt="Deal"
                       fill
-                      className='object-contain'
+                      className="object-contain"
                     />
                   </div>
                   {deal.quantity > 3 && (
-                    <div className='text-4xl whitespace-nowrap'>
+                    <div className="text-4xl whitespace-nowrap">
                       X {deal.quantity}
                     </div>
                   )}
                 </div>
                 <button
                   onClick={() => handleViewPlanClick(deal)}
-                  className='bg-lime-600 hover:bg-lime-700 text-black font-bold py-1.5 px-4 sm:py-2 sm:px-5 rounded-full transition text-sm sm:text-base'
+                  className="bg-lime-600 hover:bg-lime-700 text-black font-bold py-1.5 px-4 sm:py-2 sm:px-5 rounded-full transition text-sm sm:text-base"
                 >
-                 Buy Now
+                  Buy Now
                 </button>
               </div>
             </SwiperSlide>

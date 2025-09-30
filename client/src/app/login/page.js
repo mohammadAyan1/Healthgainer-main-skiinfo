@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { getOTPLogin, loginUser } from "@/redux/slices/authSlice";
@@ -9,13 +9,19 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import API from "@/lib/api";
 import { addToCart, updateCartGuestIdToUserId } from "@/redux/slices/cartSlice";
+import { usePathname } from "next/navigation";
+import { useRouteHistory } from "@/context/RouteContext";
 
 export default function LoginPage() {
   const [isMounted, setIsMounted] = useState(false);
+  const { previousPath, currentPath } = useRouteHistory();
   const [loginForm, setLoginForm] = useState({
     password: "",
     phone: "",
   });
+
+  const pathname = usePathname();
+  const prevPath = useRef(null);
 
   const [OtpForCheck, setOtpForCheck] = useState("");
   const [OTPNumber, setOTPNumber] = useState("");
@@ -70,59 +76,65 @@ export default function LoginPage() {
       });
   };
 
- 
   const confirmOTP = async () => {
-  setIsConfirmingOTP(true);
-  try {
-    if (OTPNumber == OtpForCheck) {
-      if (!loginForm.phone) {
-        toast.error("Please fill in all fields");
-        return;
-      }
+    setIsConfirmingOTP(true);
+    console.log(previousPath);
+    console.log(currentPath);
 
-      dispatch(loginUser({ loginForm }))
-        .unwrap()
-        .then(async (res) => {
-          if (res?.success) {
-            const GuestIdCheck = localStorage.getItem("guestId");
-            const UserId = res.user._id;
+    try {
+      if (OTPNumber == OtpForCheck) {
+        if (!loginForm.phone) {
+          toast.error("Please fill in all fields");
+          return;
+        }
 
-            if (GuestIdCheck) {
-              try {
-                const result = await dispatch(
-                  updateCartGuestIdToUserId({ GuestIdCheck, UserId })
-                ).unwrap();
+        dispatch(loginUser({ loginForm }))
+          .unwrap()
+          .then(async (res) => {
+            if (res?.success) {
+              const GuestIdCheck = localStorage.getItem("guestId");
+              const UserId = res.user._id;
 
-                console.log("Cart updated:", result);
+              if (GuestIdCheck) {
+                try {
+                  const result = await dispatch(
+                    updateCartGuestIdToUserId({ GuestIdCheck, UserId })
+                  ).unwrap();
 
-                // ✅ Remove guest cart id from localStorage after success
-                localStorage.removeItem("guestId");
-              } catch (err) {
-                console.error("Error merging cart:", err);
+                  console.log("Cart updated:", result);
+
+                  // ✅ Remove guest cart id from localStorage after success
+                  localStorage.removeItem("guestId");
+                } catch (err) {
+                  console.error("Error merging cart:", err);
+                }
               }
+              const redirectRoute = localStorage.getItem("redirectAfterLogin");
+              toast.success("Login Successful!");
+              if (previousPath == "/cart") {
+                router.push("/cart");
+              } else if (redirectRoute) {
+                localStorage.removeItem("redirectAfterLogin"); // cleanup
+                router.push(redirectRoute);
+              } else router.push("/");
             }
-
-            toast.success("Login Successful!");
-            router.push("/");
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        })
-        .finally(() => {
-          setIsConfirmingOTP(false);
-        });
-    } else {
-      toast.error("Wrong OTP");
+          })
+          .catch((err) => {
+            console.error(err);
+          })
+          .finally(() => {
+            setIsConfirmingOTP(false);
+          });
+      } else {
+        toast.error("Wrong OTP");
+        setIsConfirmingOTP(false);
+      }
+    } catch (error) {
+      console.error(error);
       setIsConfirmingOTP(false);
     }
-  } catch (error) {
-    console.error(error);
-    setIsConfirmingOTP(false);
-  }
-};
+  };
 
-  
   const resendOTP = async () => {
     setIsResendingOTP(true);
     try {

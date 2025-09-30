@@ -15,6 +15,7 @@ const CheckoutPage = () => {
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [orderNote, setOrderNote] = useState("");
   const [loadingPayment, setLoadingPayment] = useState(false);
+  const [addressSelected, setAddressSelected] = useState(false);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -37,6 +38,7 @@ const CheckoutPage = () => {
   const planTitle = searchParams.get("title");
   const quantity = Number(searchParams.get("quantity"));
   const subtitle = searchParams.get("subtitle");
+  const productId = searchParams.get("productId");
   const planAmountParam = searchParams.get("amount") || "0";
 
   const PlanAmount = Number(planAmountParam.replace(/[^0-9]/g, ""));
@@ -49,9 +51,12 @@ const CheckoutPage = () => {
           price: PlanAmount,
           quantity: quantity,
           subtitle: subtitle,
+          product: productId,
         },
       ]
     : cartItems;
+
+  console.log(itemsToShow);
 
   useEffect(() => {
     dispatch(fetchAddresses());
@@ -108,35 +113,37 @@ const CheckoutPage = () => {
         type: isViewPlan ? "viewPlan" : "cart",
       });
 
-      const createdOrderId = data.order.id;
-      const mongoOrderId = data.order.mongoOrderId;
+      console.log(data);
 
       const options = {
-        key: "rzp_live_Bqnw2amAFLgsHI",
+        key: "rzp_test_RNVfuvBSKZ0E85",
         amount: data.order.amount,
-        order_id: createdOrderId,
+        order_id: data.order.id,
         handler: async function (response) {
           try {
             const verifyRes = await axios.post("/payment/verify", {
-              razorpay_payment_id: response.razorpay_payment_id,
               razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
+              addressId: selectedAddress._id,
+              note: orderNote,
+              productSet: itemsToShow,
+              type: isViewPlan ? "viewPlan" : "cart",
             });
 
+            console.log(verifyRes);
+
             if (verifyRes.data.success) {
-              onSuccess(mongoOrderId);
+              onSuccess(verifyRes.data.orderId);
             } else {
-              alert("Payment verification failed");
+              alert("Payment verification failed. Order not created.");
             }
           } catch (err) {
-            console.error("Payment verification error:", err);
-            alert("Payment verification error");
+            console.error(err);
+            alert("Payment verification failed. Order not created.");
           }
         },
-        prefill: {
-          name: user?.name,
-          email: user?.email,
-        },
+        prefill: { name: user?.name, email: user?.email },
         theme: { color: "#3399cc" },
       };
 
@@ -144,12 +151,20 @@ const CheckoutPage = () => {
       rzp.open();
     } catch (err) {
       console.error("Order creation failed:", err);
-      alert("Something went wrong while placing the order.");
+      alert("Something went wrong.");
     }
   };
 
   const handlePlaceOrder = async () => {
+    console.log(selectedAddress);
+
     if (!selectedAddress) {
+      alert("Please select a shipping address");
+      return;
+    }
+    console.log("sdfghjkl");
+
+    if (!addressSelected) {
       alert("Please select a shipping address");
       return;
     }
@@ -160,6 +175,7 @@ const CheckoutPage = () => {
         amount: total * 100,
         user,
         onSuccess: (orderId) => {
+          console.log(orderId);
           router.push(`/orderConfirmation/${orderId}`);
         },
       });
@@ -171,56 +187,58 @@ const CheckoutPage = () => {
   };
 
   return (
-    <div className='min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8'>
-      <div className='max-w-6xl mx-auto'>
-        <h1 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-8'>
+    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8">
           Checkout
         </h1>
 
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
-          <div className='lg:col-span-2 space-y-8'>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
             <AddressSection
               selectedAddress={selectedAddress}
               setSelectedAddress={setSelectedAddress}
+              setAddressSelected={setAddressSelected}
+              addressSelected={addressSelected}
             />
 
-            <div className='bg-white p-6 rounded-lg shadow'>
-              <h2 className='text-lg font-semibold mb-4'>
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-4">
                 Order Note (Optional)
               </h2>
               <textarea
                 value={orderNote}
                 onChange={(e) => setOrderNote(e.target.value)}
-                placeholder='Any special instructions for your order...'
-                className='w-full p-3 border rounded focus:ring-1 focus:ring-primary'
-                rows='3'
+                placeholder="Any special instructions for your order..."
+                className="w-full p-3 border rounded focus:ring-1 focus:ring-primary"
+                rows="3"
               />
             </div>
           </div>
 
-          <div className='space-y-6'>
-            <div className='bg-white p-6 rounded-lg shadow'>
-              <h2 className='text-lg font-semibold mb-4'>Order Summary</h2>
+          <div className="space-y-6">
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
 
-              <div className='space-y-4'>
+              <div className="space-y-4">
                 {itemsToShow.map((item, idx) => (
-                  <div key={idx} className='flex gap-4 border-b pb-4'>
+                  <div key={idx} className="flex gap-4 border-b pb-4">
                     {!isViewPlan && (
                       <img
                         src={item.images?.[0]}
                         alt={item.name}
-                        className='w-16 h-16 object-cover rounded'
+                        className="w-16 h-16 object-cover rounded"
                       />
                     )}
-                    <div className='flex-1'>
-                      <p className='font-medium'>
+                    <div className="flex-1">
+                      <p className="font-medium">
                         {isViewPlan ? item.title : item.name}
                       </p>
-                      <p className='text-sm'>Qty: {item.quantity}</p>
-                      <p className='text-sm'>
+                      <p className="text-sm">Qty: {item.quantity}</p>
+                      <p className="text-sm">
                         {isViewPlan ? `SubTitle: ${item.subtitle}` : ""}
                       </p>
-                      <p className='font-medium'>
+                      <p className="font-medium">
                         ₹
                         {isViewPlan
                           ? PlanAmount.toFixed(2)
@@ -231,22 +249,22 @@ const CheckoutPage = () => {
                 ))}
               </div>
 
-              <div className='mt-6 border-t pt-4'>
-                <h3 className='text-lg font-semibold mb-3'>Price Details</h3>
-                <div className='space-y-2'>
-                  <div className='flex justify-between'>
+              <div className="mt-6 border-t pt-4">
+                <h3 className="text-lg font-semibold mb-3">Price Details</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
                     <p>Subtotal:</p>
                     <p>₹{subtotal.toFixed(2)}</p>
                   </div>
                   {!isViewPlan && couponApplied && (
-                    <div className='flex justify-between'>
+                    <div className="flex justify-between">
                       <p>Coupon Discount:</p>
-                      <p className='text-green-600'>
+                      <p className="text-green-600">
                         -₹{couponDiscount.toFixed(2)}
                       </p>
                     </div>
                   )}
-                  <div className='flex justify-between font-medium text-lg pt-2 border-t'>
+                  <div className="flex justify-between font-medium text-lg pt-2 border-t">
                     <p>Total Amount:</p>
                     <p>₹{total.toFixed(2)}</p>
                   </div>
@@ -263,9 +281,13 @@ const CheckoutPage = () => {
                 }`}
               >
                 {loadingPayment && (
-                  <Loader2 className='w-5 h-5 animate-spin mr-2' />
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
                 )}
-                {loadingPayment ? "Processing..." : "Pay & Place Order"}
+                {!selectedAddress
+                  ? "Please Add the address"
+                  : loadingPayment
+                  ? "Processing..."
+                  : "Pay & Place Order"}
               </button>
             </div>
           </div>

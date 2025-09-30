@@ -75,53 +75,26 @@ export default function ProductDetailPage() {
 
     const user = JSON.parse(localStorage.getItem("user")) || null;
 
-    if (!user?._id) {
-      let guestId = localStorage.getItem("guestId");
-      if (!guestId) {
-        guestId = `guest-${crypto.randomUUID()}`;
-        localStorage.setItem("guestId", guestId);
-      }
-    }
-
-    const userId = user?._id || localStorage.getItem("guestId");
+    const userId = user?._id;
+    const guestId = localStorage.getItem("guestId");
 
     try {
-      if (userId) {
-        
-        await dispatch(
-          addToCart({
-            userId,
-            productId: product._id,
-            
-            variantId:
-              product.variants && product.variants.length > 0
-                ? selectedVariant._id
-                : null,
-            quantity,
-          })
-        ).unwrap();
-        toast.success("Item added to cart successfully!");
-      } else {
-        
-        const storedCart = JSON.parse(localStorage.getItem("addToCart")) || [];
-        const existingIndex = storedCart.findIndex(
-          (item) => item._id === product._id
-        );
-
-        if (existingIndex > -1) {
-          storedCart[existingIndex].quantity += quantity;
-        } else {
-          storedCart.push({ ...product, quantity });
-        }
-
-        localStorage.setItem("addToCart", JSON.stringify(storedCart));
-        toast.success("Item added to cart successfully!");
-      }
+      await dispatch(
+        addToCart({
+          userId,
+          productId: product._id,
+          guestId,
+          variantId:
+            product.variants && product.variants.length > 0
+              ? selectedVariant._id
+              : null,
+          quantity,
+        })
+      ).unwrap();
+      toast.success("Item added to cart successfully!");
     } catch (err) {
       toast.error("Failed to add item to cart");
     }
-
-    router.push("/checkout");
   };
 
   const toggleWishlist = () => {

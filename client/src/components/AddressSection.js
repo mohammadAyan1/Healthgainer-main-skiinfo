@@ -20,7 +20,12 @@ const initialAddress = {
   isDefault: false,
 };
 
-const AddressSection = ({ selectedAddress, setSelectedAddress }) => {
+const AddressSection = ({
+  selectedAddress,
+  setSelectedAddress,
+  setAddressSelected,
+  addressSelected,
+}) => {
   const dispatch = useDispatch();
   const { addresses, loading, error } = useSelector((state) => state.address);
 
@@ -84,7 +89,6 @@ const AddressSection = ({ selectedAddress, setSelectedAddress }) => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow">
-
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Shipping Addresses</h2>
         <button
@@ -201,9 +205,13 @@ const AddressSection = ({ selectedAddress, setSelectedAddress }) => {
             addresses.map((address) => (
               <div
                 key={address._id}
-                onClick={() => setSelectedAddress(address)}
+                onClick={() => {
+                  setSelectedAddress(address);
+                  setAddressSelected(!addressSelected);
+                }}
                 className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                  selectedAddress?._id === address._id
+                  // selectedAddress?._id === address._id
+                  addressSelected
                     ? "border-2 border-primary bg-primary/5"
                     : "hover:border-gray-400"
                 }`}
@@ -219,9 +227,8 @@ const AddressSection = ({ selectedAddress, setSelectedAddress }) => {
                     <p className="text-sm text-gray-600">{address.phone}</p>
                   </div>
                   <div className="flex gap-2">
-                    {selectedAddress?._id === address._id && (
-                      <FaCheck className="text-primary mt-1" />
-                    )}
+                    {/* {selectedAddress?._id === address._id && ( */}
+                    {addAddress && <FaCheck className="text-primary mt-1" />}
                     <IconBtn
                       onClick={(e) => {
                         e.stopPropagation();

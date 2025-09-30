@@ -63,6 +63,8 @@ export const removeFromCart = createAsyncThunk(
         guestId,
         itemId,
       });
+      console.log( "userId : ",userId,"guestid : ",guestId,"itemId : ",itemId);
+      
       return response.data.cart.items || [];
     } catch (error) {
       return rejectWithValue(
@@ -93,9 +95,9 @@ export const updateCartQuantity = createAsyncThunk(
 // Empty cart
 export const emptyCart = createAsyncThunk(
   "cart/emptyCart",
-  async (userId, { rejectWithValue }) => {
+  async ({userId,guestId}, { rejectWithValue }) => {
     try {
-      const response = await API.post(`/cart/empty`, { userId });
+      const response = await API.post(`/cart/empty`, { userId,guestId });
       return response.data.cart.items || [];
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error emptying cart");
