@@ -1,10 +1,16 @@
 "use client";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { fetchProducts, deleteProduct } from "@/redux/slices/productSlice";
+import {
+  fetchProducts,
+  deleteProduct,
+  fetchProductById,
+} from "@/redux/slices/productSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
+// ---------- Icons ----------
 const SearchIcon = () => (
   <svg
     className="w-4 h-4"
@@ -53,9 +59,9 @@ const DownloadIcon = () => (
   </svg>
 );
 
-const SortIcon = () => (
+const SortIcon = ({ direction }) => (
   <svg
-    className="w-3 h-3 ml-1"
+    className={`w-3 h-3 ml-1 ${direction === "asc" ? "rotate-180" : ""}`}
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -123,24 +129,20 @@ const TrashIcon = () => (
   </svg>
 );
 
+// ---------- Components ----------
 const TableHeader = ({ label, sortKey, onSort, sortConfig }) => (
   <th className="p-3 text-left cursor-pointer" onClick={() => onSort(sortKey)}>
     <div className="flex items-center">
-      {label} <SortIcon />
+      {label}{" "}
+      {sortConfig.key === sortKey && (
+        <SortIcon direction={sortConfig.direction} />
+      )}
     </div>
   </th>
 );
 
-const ActionButton = ({
-  href,
-  onClick,
-  icon: Icon,
-  color,
-  label,
-  className = "",
-}) => {
-  const buttonClass = `${color} transition-colors p-1 rounded hover:bg-opacity-10 ${className}`;
-
+const ActionButton = ({ href, onClick, icon: Icon, color, label }) => {
+  const buttonClass = `${color} transition-colors p-1 rounded hover:bg-opacity-10`;
   if (href) {
     return (
       <Link href={href}>
@@ -150,7 +152,6 @@ const ActionButton = ({
       </Link>
     );
   }
-
   return (
     <button aria-label={label} className={buttonClass} onClick={onClick}>
       <Icon />
@@ -162,7 +163,7 @@ const ProductRow = ({ product, onDelete }) => (
   <tr className="border-b hover:bg-gray-50 transition-colors">
     <td className="p-3 flex items-center space-x-2 w-64">
       <img
-        src={product.images?.[0]}
+        src={product.images?.[0] || "/placeholder.png"}
         alt={product.name}
         width={40}
         height={40}
@@ -171,16 +172,9 @@ const ProductRow = ({ product, onDelete }) => (
       />
       <span className="truncate">{product.name}</span>
     </td>
-    <td className="p-3">₹{product.mrp}</td>
-    <td className="p-3">₹{product.price}</td>
-    <td className="p-3">{product.stock}</td>
-    {/* <td className="p-3">
-      <Link href={`/admin/add-variant/${product._id}`}>
-        <button className="text-blue-500 hover:text-blue-700 transition-colors">
-          Add Variant
-        </button>
-      </Link>
-    </td> */}
+    <td className="p-3">₹{product.mrp ?? 0}</td>
+    <td className="p-3">₹{product.price ?? 0}</td>
+    <td className="p-3">{product.stock ?? 0}</td>
     <td className="p-3">
       <div className="flex items-center space-x-2">
         <ActionButton
@@ -206,46 +200,75 @@ const ProductRow = ({ product, onDelete }) => (
   </tr>
 );
 
+// ---------- Main Component ----------
 export default function Products() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const dispatch = useDispatch();
-  const {
-    products: productsData,
-    loading,
-    error,
-  } = useSelector((state) => state.product);
 
+  const dispatch = useDispatch();
+  const { id } = useParams();
+
+  const { products, loading, error, deleteStatus } = useSelector(
+    (state) => state.product
+  );
+  console.log(products);
+  console.log(loading);
+  console.log(error);
+  console.log(deleteStatus);
+
+  // Fetch all products
   useEffect(() => {
     dispatch(fetchProducts());
-  }, [dispatch]);
+  }, [dispatch,deleteStatus]);
+
+  // Fetch single product by ID (for details page)
+  useEffect(() => {
+    if (id) dispatch(fetchProductById(id));
+  }, [id, dispatch]);
+
+  // Merge single product
+  const mergedProducts = useMemo(() => {
+    const list = products?.products || [];
+    const single = products?.single;
+    if (single && !list.find((p) => p._id === single._id))
+      return [single, ...list];
+    return list;
+  }, [products]);
+
+  // const mergedProducts = useMemo(() => {
+  //   return products || [];
+  // }, [products]);
 
   const processedProducts = useMemo(() => {
-    const products = productsData?.products || [];
-    const filtered = products.filter((product) => {
-      const query = searchQuery.toLowerCase();
+    const filtered = mergedProducts?.filter((p) => {
+      const q = searchQuery.toLowerCase();
       return (
-        product.name?.toLowerCase().includes(query) ||
-        product.status?.toLowerCase().includes(query) ||
-        product.price?.toString().includes(query)
+        p.name?.toLowerCase().includes(q) ||
+        p.status?.toLowerCase().includes(q) ||
+        p.price?.toString().includes(q)
       );
     });
-
-    if (sortConfig.key) {
-      filtered.sort((a, b) => {
-        const aVal = a[sortConfig.key];
-        const bVal = b[sortConfig.key];
-        if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-        if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-        return 0;
-      });
-    }
-
+    if (sortConfig.key)
+      filtered.sort((a, b) =>
+        (a[sortConfig.key] ?? 0) < (b[sortConfig.key] ?? 0)
+          ? sortConfig.direction === "asc"
+            ? -1
+            : 1
+          : (a[sortConfig.key] ?? 0) > (b[sortConfig.key] ?? 0)
+          ? sortConfig.direction === "asc"
+            ? 1
+            : -1
+          : 0
+      );
     return filtered;
-  }, [productsData?.products, searchQuery, sortConfig]);
-  const totalPages = Math.ceil(processedProducts.length / itemsPerPage);
+  }, [mergedProducts, searchQuery, sortConfig]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(processedProducts.length / itemsPerPage)
+  );
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentProducts = processedProducts.slice(
@@ -260,25 +283,22 @@ export default function Products() {
     }));
   }, []);
 
+  // ✅ Delete Product (toast + remove from state without refetch)
   const handleDelete = useCallback(
     async (productId) => {
-      const confirmDelete = window.confirm(
-        "Are you sure you want to delete this product?"
-      );
-      if (!confirmDelete) return;
-
+      if (!window.confirm("Are you sure you want to delete this product?"))
+        return;
       try {
-        const result = await dispatch(deleteProduct(productId));
-
-        if (deleteProduct.fulfilled.match(result)) {
-          toast.success("Product deleted successfully");
-          dispatch(fetchProducts());
-        } else {
-          toast.error("Failed to delete product");
+        await dispatch(deleteProduct(productId)).unwrap();
+        if (deleteStatus) {
+          toast.success("Product deleted successfully"); // red toast
+          dispatch(fetchProducts())
+          
         }
-      } catch (error) {
-        console.error("Error deleting product:", error);
-        toast.error("Something went wrong while deleting");
+      } catch (err) {
+        // toast.error("Error deleting product");
+        console.error("Delete error:", err);
+        toast.error(err?.message || "Error deleting product");
       }
     },
     [dispatch]
@@ -288,14 +308,14 @@ export default function Products() {
     setSearchQuery(e.target.value);
     setCurrentPage(1);
   }, []);
-
-  const handlePreviousPage = useCallback(() => {
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
-  }, []);
-
-  const handleNextPage = useCallback(() => {
-    setCurrentPage((prev) => prev + 1);
-  }, []);
+  const handlePreviousPage = useCallback(
+    () => setCurrentPage((p) => Math.max(p - 1, 1)),
+    []
+  );
+  const handleNextPage = useCallback(
+    () => setCurrentPage((p) => Math.min(p + 1, totalPages)),
+    [totalPages]
+  );
 
   const tableHeaders = useMemo(
     () => [
@@ -307,34 +327,52 @@ export default function Products() {
     []
   );
 
-  if (loading) {
-    return (
-      <div className="py-6 px-2 bg-gray-100 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-pulse text-blue-500 text-lg">Loading...</div>
-        </div>
-      </div>
-    );
-  }
+  // ---------- Export CSV ----------
+  const handleExport = useCallback(() => {
+    if (!processedProducts || processedProducts.length === 0) {
+      toast.info("No products to export");
+      return;
+    }
 
-  if (error) {
+    try {
+      const headers = ["Name", "MRP", "Price", "Stock", "Image"];
+      const rows = processedProducts.map((p) => [
+        `"${p.name ?? ""}"`,
+        p.mrp ?? 0,
+        p.price ?? 0,
+        p.stock ?? 0,
+        p.images?.[0] ?? "",
+      ]);
+
+      const csvContent = [headers, ...rows].map((e) => e.join(",")).join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `products_export_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Export error:", err);
+      toast.error("Failed to export products");
+    }
+  }, [processedProducts]);
+
+  if (loading)
     return (
-      <div className="py-6 px-2 bg-gray-100 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-500 text-lg mb-4">Error: {error}</p>
-          <button
-            onClick={() => dispatch(fetchProducts())}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            Retry
-          </button>
-        </div>
+      <div className="p-6 text-center text-blue-500 animate-pulse">
+        Loading...
       </div>
     );
-  }
+  if (error)
+    return <div className="p-6 text-center text-red-500">Error: {error}</div>;
 
   return (
     <div className="py-6 px-2 bg-gray-100 min-h-screen">
+      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <h2 className="text-2xl font-semibold">Products</h2>
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 w-full md:w-auto">
@@ -350,12 +388,13 @@ export default function Products() {
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64"
             />
           </div>
-
-          <button className="flex items-center bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors w-full md:w-auto">
+          <button
+            onClick={handleExport}
+            className="flex items-center bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors w-full md:w-auto"
+          >
             <DownloadIcon />
             Export
           </button>
-
           <Link href="/admin/create-product">
             <button className="flex items-center bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors w-full md:w-auto">
               <PlusIcon />
@@ -365,38 +404,34 @@ export default function Products() {
         </div>
       </div>
 
+      {/* Table */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-200">
               <tr>
-                {tableHeaders.map((header) => (
+                {tableHeaders.map((h) => (
                   <TableHeader
-                    key={header.sortKey}
-                    label={header.label}
-                    sortKey={header.sortKey}
+                    key={h.sortKey}
+                    label={h.label}
+                    sortKey={h.sortKey}
                     onSort={handleSort}
                     sortConfig={sortConfig}
                   />
                 ))}
-                {/* <th className="p-3 text-left">Add Variant</th> */}
                 <th className="p-3 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
               {currentProducts.length > 0 ? (
-                currentProducts.map((product) => (
-                  <ProductRow
-                    key={product._id}
-                    product={product}
-                    onDelete={handleDelete}
-                  />
+                currentProducts.map((p) => (
+                  <ProductRow key={p._id} product={p} onDelete={handleDelete} />
                 ))
               ) : (
                 <tr>
                   <td colSpan="6" className="p-6 text-center text-gray-500">
                     {searchQuery
-                      ? "No products found matching your search."
+                      ? "No products found matching your search"
                       : "No products found"}
                   </td>
                 </tr>
@@ -406,25 +441,25 @@ export default function Products() {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-center mt-4 gap-4">
+      {/* Pagination */}
+      <div className="flex justify-between items-center mt-4">
         <div className="text-sm text-gray-600">
           Showing {indexOfFirstItem + 1} to{" "}
           {Math.min(indexOfLastItem, processedProducts.length)} of{" "}
           {processedProducts.length} products
         </div>
-
         <div className="flex space-x-2">
           <button
             onClick={handlePreviousPage}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
           <button
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>

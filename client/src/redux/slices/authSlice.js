@@ -22,6 +22,7 @@ export const loginUser = createAsyncThunk(
       const { data } = await API.post("/auth/login", userData);
       // Token is set as httpOnly cookie by backend; only persist user locally
       localStorage.setItem("user", JSON.stringify(data.user));
+      // localStorage.setItem("user", JSON.stringify(data.user));
 
       // Store token for withAuth
       localStorage.setItem("token", data.token); // <-- add this
@@ -36,8 +37,6 @@ export const loginUser = createAsyncThunk(
 export const getOTPLogin = createAsyncThunk(
   "auth/getotplogin",
   async (userData, thunkAPI) => {
-    
-
     try {
       const { data } = await API.post("/auth/getotplogin", userData);
       // Token is set as httpOnly cookie by backend; only persist user locally
@@ -69,6 +68,9 @@ export const registerUser = createAsyncThunk(
     try {
       const { data } = await API.post("/auth/register", userData);
       localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Store token for withAuth
+      localStorage.setItem("token", data.token); // <-- add this
       return data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
@@ -107,8 +109,6 @@ export const getUserProfile = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   "auth/updateUser",
   async (userData, thunkAPI) => {
-    
-
     try {
       const { data } = await API.put("/auth/update", userData);
       localStorage.setItem("user", JSON.stringify(data.user));
@@ -122,8 +122,6 @@ export const updateUser = createAsyncThunk(
 export const updateUserDetails = createAsyncThunk(
   "auth/updateUser",
   async (userData, thunkAPI) => {
-    
-
     try {
       const { data } = await API.put("/auth/updateDetails", userData);
       localStorage.setItem("user", JSON.stringify(data.user));
@@ -138,8 +136,6 @@ export const updateUserDetails = createAsyncThunk(
 export const deleteUser = createAsyncThunk(
   "auth/deleteUser",
   async (id, thunkAPI) => {
-    
-
     try {
       await API.delete("/auth/delete", { data: { id } });
       localStorage.removeItem("user");

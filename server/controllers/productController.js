@@ -5,6 +5,8 @@ const imagekit = require("../config/imageKit");
 exports.createProduct = async (req, res) => {
   try {
     const { name, description, category, mrp, discount, stock } = req.body;
+    console.log(req.body);
+
     // Ensure images exist in req.files
     if (!req.files || !req.files.images) {
       return res
@@ -46,13 +48,11 @@ exports.createProduct = async (req, res) => {
     });
 
     await product.save();
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "Product created successfully",
-        product,
-      });
+    res.status(201).json({
+      success: true,
+      message: "Product created successfully",
+      product,
+    });
   } catch (error) {
     console.error("Error creating product:", error);
     res.status(500).json({
@@ -112,19 +112,15 @@ exports.updateProduct = async (req, res) => {
   try {
     const { name, description, category, mrp, discount, stock, status } =
       req.body;
-    
+
     const existingImages = Object.keys(req.body)
       .filter((key) => key.startsWith("existingImages[")) // Filter only existingImages keys
       .sort((a, b) => a.localeCompare(b)) // Sort to maintain order
       .map((key) => req.body[key]); // Extract values
 
-    
-
     if (!Array.isArray(existingImages)) {
       existingImages = existingImages ? [existingImages] : [];
     }
-
-   
 
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -187,13 +183,11 @@ exports.updateProduct = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating product:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Internal server error",
-        error: error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
 

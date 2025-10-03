@@ -33,7 +33,7 @@ function Slider({ slides }) {
 
   useEffect(() => {
     if (totalSlides === 0) return;
-    const interval = setInterval(scrollNext, 10000);
+    const interval = setInterval(scrollNext, 5000);
     return () => clearInterval(interval);
   }, [totalSlides, scrollNext]);
 

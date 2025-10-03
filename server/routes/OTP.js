@@ -16,8 +16,6 @@ routes.post("/", async (req, res) => {
       });
     }
 
-    
-
     const otpNumber = Math.floor(1000 + Math.random() * 9000);
 
     const response = await axios.get(url, {
@@ -44,15 +42,12 @@ routes.post("/", async (req, res) => {
       message: "OTP Generated Successfull",
       Data: otpNumber,
     });
-  } catch (error) {
-    
-  }
+  } catch (error) {}
 });
 
 routes.post("/resend", async (req, res) => {
   try {
     const { phone, OTPNumber } = req.body;
-    
 
     if (!phone) {
       res.status(405).json({
@@ -61,7 +56,6 @@ routes.post("/resend", async (req, res) => {
         Data: null,
       });
     }
-  
 
     const response = await axios.get(url, {
       params: {
@@ -87,9 +81,7 @@ routes.post("/resend", async (req, res) => {
       message: "OTP Generated Successfull",
       Data: OTPNumber,
     });
-  } catch (error) {
-    
-  }
+  } catch (error) {}
 });
 
 module.exports = routes;

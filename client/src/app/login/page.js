@@ -8,8 +8,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import API from "@/lib/api";
-import { addToCart, updateCartGuestIdToUserId } from "@/redux/slices/cartSlice";
-import { usePathname } from "next/navigation";
+import { updateCartGuestIdToUserId } from "@/redux/slices/cartSlice";
+
 import { useRouteHistory } from "@/context/RouteContext";
 
 export default function LoginPage() {
@@ -20,8 +20,7 @@ export default function LoginPage() {
     phone: "",
   });
 
-  const pathname = usePathname();
-  const prevPath = useRef(null);
+  const inputRef = useRef(null);
 
   const [OtpForCheck, setOtpForCheck] = useState("");
   const [OTPNumber, setOTPNumber] = useState("");
@@ -40,6 +39,18 @@ export default function LoginPage() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // useEffect(() => {
+  //   if (inputRef.current) {
+  //     inputRef.current.focus();
+  //   }
+  // }, []);
+
+  useEffect(() => {
+    if (isMounted && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isMounted]);
 
   // Show error toast if there's an error
   useEffect(() => {
@@ -181,6 +192,7 @@ export default function LoginPage() {
                       Phone Number
                     </label>
                     <input
+                      ref={inputRef}
                       id="phone"
                       type="tel"
                       maxLength={10}
@@ -223,10 +235,10 @@ export default function LoginPage() {
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           ></path>
                         </svg>
-                        Signing in...
+                        Number Verify...
                       </span>
                     ) : (
-                      "Sign In"
+                      "OTP Verification"
                     )}
                   </motion.button>
                 </div>

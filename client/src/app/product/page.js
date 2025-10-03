@@ -8,6 +8,18 @@ import { FaStar } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 
+// ✅ Safe UUID generator with fallback
+function generateUUID() {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = crypto.getRandomValues(new Uint8Array(1))[0] % 16 | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 export default function ProductGallery() {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -28,24 +40,21 @@ export default function ProductGallery() {
   const handleProductClick = (id) => {
     router.push(`/product/${id}`);
   };
-  
 
   let guestId = localStorage.getItem("guestId");
 
   if (!guestId) {
-    let guestId = `guest-${crypto.randomUUID()}`;
+    // let guestId = `guest-${crypto.randomUUID()}`;
+    guestId = `guest-${generateUUID()}`;
     localStorage.setItem("guestId", guestId);
   }
   const handleAddToCart = async (product) => {
     setLoadingProductId(product._id);
     let guestId = user?._id ? null : localStorage.getItem("guestId");
-  
+
     const userId = user?._id;
 
- 
-
     try {
-      
       await dispatch(
         addToCart({
           userId,
@@ -56,7 +65,6 @@ export default function ProductGallery() {
         })
       ).unwrap();
       toast.success("Item added to cart successfully!");
-  
     } catch (err) {
       toast.error("Failed to add to cart");
     } finally {

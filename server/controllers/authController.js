@@ -1,4 +1,3 @@
-
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -9,39 +8,27 @@ const axios = require("axios");
 const isProd = process.env.NODE_ENV === "production";
 console.log(false);
 
-
 const app = express();
 
 // get OTP after User validation
 exports.getOTP = async (req, res) => {
   try {
-    const { firstName, lastName, mobileNumber, email, password } = req.body;
+    const { firstName, lastName, mobileNumber, password } = req.body;
 
-    if ( !mobileNumber) {
+    if (!mobileNumber) {
       return res
         .status(400)
         .json({ message: "All fields are required", success: false });
     }
 
-    // check for existing user with either email or mobileNumber
-    const userExists = await User.findOne({
-      $or: [{ email }, { mobileNumber }],
-    });
-
-    // console.log(userExists);
+    // check for existing user with either  mobileNumber
+    const userExists = await User.findOne({ mobileNumber });
 
     if (userExists) {
-      if (userExists.email === email) {
-        return res
-          .status(400)
-          .json({ message: "This Email already exists", success: false });
-      }
-      if (userExists.mobileNumber === mobileNumber) {
-        return res.status(400).json({
-          message: "This Mobile Number already exists",
-          success: false,
-        });
-      }
+      return res.status(400).json({
+        message: "This Mobile Number already exists",
+        success: false,
+      });
     }
 
     // Generate OTP
@@ -82,9 +69,8 @@ exports.getOTP = async (req, res) => {
 // register user after Check OTP
 exports.registerUser = async (req, res) => {
   try {
-    const { firstName, lastName, mobileNumber, email, password } = req.body;
-
-    // console.log(req.body, "HEELOREgister");
+    const { firstName, lastName, mobileNumber } = req.body;
+    console.log(req.body);
 
     if (!mobileNumber) {
       return res
@@ -92,35 +78,23 @@ exports.registerUser = async (req, res) => {
         .json({ message: "All fields are required", success: false });
     }
 
-    // check for existing user with either email or mobileNumber
-    const userExists = await User.findOne({
-      $or: [{ email }, { mobileNumber }],
-    });
-
-    // console.log(userExists);
+    // check for existing user with either  mobileNumber
+    const userExists = await User.findOne({ mobileNumber });
 
     if (userExists) {
-      if (userExists.email === email) {
-        return res
-          .status(400)
-          .json({ message: "This Email already exists", success: false });
-      }
-      if (userExists.mobileNumber === mobileNumber) {
-        return res.status(400).json({
-          message: "This Mobile Number already exists",
-          success: false,
-        });
-      }
+      return res.status(400).json({
+        message: "This Mobile Number already exists",
+        success: false,
+      });
     }
 
-    const profilePhoto = `https://avatar.iran.liara.run/public/boy?email=${email}`;
+    const profilePhoto = `https://avatar.iran.liara.run/public/boy?email=mohammadayan@gmail.com`;
 
     const newUser = await User.create({
       firstName,
       lastName,
       mobileNumber,
-      email,
-      // password: hashedPassword,
+
       profilePhoto,
       lastLogin: new Date(),
     });
@@ -132,8 +106,6 @@ exports.registerUser = async (req, res) => {
         expiresIn: "7d",
       }
     );
-
-    
 
     // ✅ Cookies (env-aware)
     const cookieExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -174,12 +146,10 @@ exports.getOTPLogin = async (req, res) => {
 
     const user = await User.findOne({ mobileNumber: phone });
     if (!user)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "User not registered with this number",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "User not registered with this number",
+      });
 
     const otpNumber = Math.floor(1000 + Math.random() * 9000);
 
@@ -217,8 +187,6 @@ exports.getOTPLogin = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
   try {
-    
-
     const { phone } = req.body.loginForm;
     if (!phone) {
       return res
@@ -240,8 +208,6 @@ exports.loginUser = async (req, res) => {
       }
     );
 
-    
-
     // ✅ Cookies (env-aware)
     const cookieExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     const commonCookie = {
@@ -253,8 +219,6 @@ exports.loginUser = async (req, res) => {
 
     res.cookie("token", token, { ...commonCookie, httpOnly: true });
     res.cookie("role", user.role, { ...commonCookie });
-
-    
 
     res.status(200).json({
       message: "Login Successful",
@@ -362,10 +326,9 @@ exports.todayLogins = async (req, res) => {
 exports.changePassword = async (req, res) => {
   try {
     const id = req.id;
-    
 
     const { newPassword, oldPassword } = req.body;
-    
+
     const currentPassword = oldPassword;
     const password = newPassword;
 
@@ -398,25 +361,17 @@ exports.changePassword = async (req, res) => {
 exports.updateUserDetails = async (req, res) => {
   try {
     const id = req.id;
-    const { email, firstName, lastName, mobileNumber, role } = req.body;
-    
+    const { firstName, lastName, mobileNumber, role } = req.body;
 
     const userId = id;
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (email && email !== user.email) {
-      const emailExists = await User.findOne({ email });
-      if (emailExists)
-        return res.status(400).json({ message: "Email already in use" });
-      user.email = email;
-    }
-
     user.firstName = firstName || user.firstName;
     user.lastName = lastName || user.lastName;
     user.mobileNumber = mobileNumber || user.mobileNumber;
-    user.email = email || user.email;
+
     // user.role = role || user.role;
 
     await user.save();

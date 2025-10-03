@@ -45,7 +45,7 @@ const DashboardLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50 relative ">
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-sm z-20 p-4 flex justify-between items-center">
+      <header className="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-sm z-20 p-12 flex justify-between items-center">
         <h1 className="text-xl font-bold">My Account</h1>
         <button
           className="text-2xl text-gray-700 focus:outline-none"
@@ -70,7 +70,7 @@ const DashboardLayout = ({ children }) => {
               <h1 className="text-xl font-bold hidden lg:block">My Account</h1>
             </div>
 
-            <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+            <nav className="flex-1 overflow-y-auto mt-14 p-4 space-y-1">
               {navItems.map(({ href, label, icon }) => (
                 <Link
                   key={href}

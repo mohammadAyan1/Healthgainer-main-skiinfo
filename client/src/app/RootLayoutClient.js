@@ -28,15 +28,27 @@ export default function RootLayoutClient({ children }) {
     setIsAdminRoute(pathname.startsWith("/admin"));
   }, [pathname]);
 
+  useEffect(() => {
+    localStorage.setItem("date", Date.now().toString());
+  }, []);
+
   return (
-    <html lang='en' className='scroll-smooth'>
+    <html lang="en" className="scroll-smooth">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-900`}
       >
         <Providers>
           {!isAdminRoute && <Navbar />}
           <main>
-            <ToastContainer />
+            <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              pauseOnHover
+              draggable
+            />
             <ScrollToTopButton />
             {children}
           </main>

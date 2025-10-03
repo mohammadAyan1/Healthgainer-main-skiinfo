@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProductById, updateProduct } from "@/redux/slices/productSlice";
 import dynamic from "next/dynamic";
 
-const { toast } = dynamic(() => import("react-toastify"), { ssr: false });
+// const { toast } = dynamic(() => import("react-toastify"), { ssr: false });
+import { toast } from "react-toastify";
 
 export default function EditProduct() {
   const router = useRouter();
@@ -82,16 +83,14 @@ export default function EditProduct() {
           formDataToSend.append("newImages", file);
         });
 
-       
-
         const response = await dispatch(updateProduct(formDataToSend)).unwrap();
-        
 
-        (await toast).success("Product updated successfully!");
+        console.log("success response", response);
+
+        toast.success("Product updated successfully!");
         router.push("/admin/products");
       } catch (error) {
-        
-        (await toast).error(error || "Failed to update product.");
+        toast.error(error || "Failed to update product.");
       } finally {
         setIsSubmitting(false);
       }

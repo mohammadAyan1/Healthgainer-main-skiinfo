@@ -21,7 +21,7 @@ export default function ProductDetailPage() {
   const { id } = useParams();
   const dispatch = useDispatch();
 
-  const product = useSelector((state) => state.product.product?.product) || {};
+  const product = useSelector((state) => state.product.product) || {};
   const { loading, error } = useSelector((state) => state.product);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);

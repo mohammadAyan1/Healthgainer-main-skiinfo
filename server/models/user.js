@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const type = require("mongoose/lib/schema/operators/type");
 
 const userModel = new mongoose.Schema(
   {
@@ -14,16 +15,12 @@ const userModel = new mongoose.Schema(
       type: String,
       required: false,
     },
-    phone:{
-      type:String,
-      default:"",
-      unique:true
-    },
-    email: {
+    phone: {
       type: String,
       default: "",
-      unique: false,
+      unique: true,
     },
+
     mobileNumber: {
       type: String,
       default: "",

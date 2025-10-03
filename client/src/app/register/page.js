@@ -8,14 +8,16 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import API from "@/lib/api";
+import { updateCartGuestIdToUserId } from "@/redux/slices/cartSlice";
+import { useRouteHistory } from "@/context/RouteContext";
 
 export default function RegisterPage() {
+  const { previousPath, secondPreviousPath, currentPath } = useRouteHistory();
   const [isMounted, setIsMounted] = useState(false);
   const [registerForm, setRegisterForm] = useState({
     firstName: "",
     lastName: "",
     phone: "",
-    email: "",
     mobileNumber: "",
     password: "",
     confirmPassword: "",
@@ -56,10 +58,9 @@ export default function RegisterPage() {
     const {
       firstName,
       lastName,
-      email,
+
       mobileNumber,
       password,
-      confirmPassword,
     } = registerForm;
 
     if (!firstName.trim() || !mobileNumber.trim()) {
@@ -67,18 +68,13 @@ export default function RegisterPage() {
       return;
     }
 
-    // if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-    //   toast.error("Please enter a valid email address");
-    //   return;
-    // }
-
     if (mobileNumber.trim().length !== 10 || isNaN(mobileNumber.trim())) {
       toast.error("Mobile number must be 10 digits");
       return;
     }
 
     setIsLoading(true);
-    dispatch(getOTP({ firstName, lastName, email, mobileNumber, password }))
+    dispatch(getOTP({ firstName, lastName, mobileNumber, password }))
       .unwrap()
       .then((res) => {
         if (res?.success) {
@@ -96,27 +92,53 @@ export default function RegisterPage() {
       });
   };
 
-  const confirmOTP = () => {
+  const confirmOTP = async () => {
     try {
       const {
         firstName,
         lastName,
-        email,
+
         mobileNumber,
         password,
         confirmPassword,
       } = registerForm;
 
+      console.log(currentPath);
+      console.log(previousPath);
+
       if (OTPNumber == getOtp) {
         setIsLoading(true);
-        dispatch(
-          registerUser({ firstName, lastName, email, mobileNumber, password })
-        )
+        dispatch(registerUser({ firstName, lastName, mobileNumber, password }))
           .unwrap()
-          .then((res) => {
+          .then(async (res) => {
             if (res?.success) {
-              toast.success("Registration Successful! Please log in.");
-              router.push("/login");
+              const GuestIdCheck = localStorage.getItem("guestId");
+              const UserId = res.user._id;
+
+              if (GuestIdCheck) {
+                try {
+                  const result = await dispatch(
+                    updateCartGuestIdToUserId({ GuestIdCheck, UserId })
+                  ).unwrap();
+
+                  console.log("Cart updated:", result);
+
+                  // ✅ Remove guest cart id from localStorage after success
+                  localStorage.removeItem("guestId");
+                } catch (err) {
+                  console.error("Error merging cart:", err);
+                }
+              }
+              const redirectRoute = localStorage.getItem("redirectAfterLogin");
+              console.log(redirectRoute);
+
+              toast.success("Registration Successful!");
+              if (previousPath == "/login" && secondPreviousPath == "/cart") {
+                router.push("/cart");
+              } else if (redirectRoute) {
+                localStorage.removeItem("redirectAfterLogin"); // cleanup
+                router.push(redirectRoute);
+              } else router.push("/");
             }
           });
       } else {
@@ -127,6 +149,10 @@ export default function RegisterPage() {
       setIsLoading(false);
     }
   };
+
+  console.log(secondPreviousPath);
+  console.log(previousPath);
+  console.log(currentPath);
 
   if (!isMounted) return null;
 
@@ -222,29 +248,6 @@ export default function RegisterPage() {
                         }
                       />
                     </div>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Email Address
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                      placeholder="your@email.com"
-                      value={registerForm.email}
-                      onChange={(e) =>
-                        setRegisterForm({
-                          ...registerForm,
-                          email: e.target.value,
-                        })
-                      }
-                      // required
-                    />
                   </div>
 
                   <div>
