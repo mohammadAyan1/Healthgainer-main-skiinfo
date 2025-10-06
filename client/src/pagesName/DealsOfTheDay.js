@@ -23,7 +23,7 @@ export default function DealsOfTheDay() {
   const nextRef = useRef(null);
   const router = useRouter();
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("user")) || null;
 
   useEffect(() => {
     dispatch(fetchDeals());
@@ -49,16 +49,16 @@ export default function DealsOfTheDay() {
     }).toString();
 
     const targetRoute = `/checkout?${query}`;
-    if (user) {
-      router.push(targetRoute);
-    } else {
-      localStorage.setItem("redirectAfterLogin", targetRoute);
-      toast.warn("Please login to continue!", {
-        position: "top-center",
-        autoClose: 3000,
-      });
-      router.push(`/login`);
-    }
+    // if (user) {
+    router.push(targetRoute);
+    // } else {
+    //   localStorage.setItem("redirectAfterLogin", targetRoute);
+    //   toast.warn("Please login to continue!", {
+    //     position: "top-center",
+    //     autoClose: 3000,
+    //   });
+    //   router.push(`/login`);
+    // }
   };
 
   if (loading || !deals.length) {

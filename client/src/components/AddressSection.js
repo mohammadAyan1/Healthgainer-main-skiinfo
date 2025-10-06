@@ -8,6 +8,7 @@ import {
   deleteAddress,
   clearAddressError,
 } from "@/redux/slices/addressSlice";
+import { useRouter } from "next/navigation";
 
 const initialAddress = {
   fullName: "",
@@ -37,6 +38,8 @@ const AddressSection = ({
     dispatch(fetchAddresses());
   }, [dispatch]);
 
+  const router = useRouter();
+
   useEffect(() => {
     if (!showForm && error) {
       dispatch(clearAddressError());
@@ -61,7 +64,14 @@ const AddressSection = ({
           updateAddress({ id: currentAddress._id, ...currentAddress })
         ).unwrap();
       } else {
-        await dispatch(addAddress(currentAddress)).unwrap();
+        console.log("asdfghjk");
+        const user = JSON.parse(localStorage.getItem("user")) || null;
+        if (user) {
+          await dispatch(addAddress(currentAddress)).unwrap();
+        } else {
+          localStorage.setItem("address", currentAddress);
+          router.push("/login");
+        }
       }
       await dispatch(fetchAddresses());
       resetForm();

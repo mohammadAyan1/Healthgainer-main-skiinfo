@@ -14,7 +14,7 @@ import AyurvedicWeightGainer from "@/pagesName/AyurvedicWeightGainer";
 import HealthGainerBenefits from "@/pagesName/HealthGainerBenefits";
 import NaturalHerbs from "@/pagesName/NaturalHerbs";
 import KeywordCloud from "./keyword/page";
-import Update from "@/components/Update";
+// import Update from "@/components/Update";
 
 const page = () => {
   return (
@@ -33,7 +33,7 @@ const page = () => {
       <KeywordCloud />
       {/* <BlogSection/> */}
       <CallbackForm />
-      <Update />
+      {/* <Update /> */}
       <InfiniteScrollText />
       <WhatsAppButton />
     </div>

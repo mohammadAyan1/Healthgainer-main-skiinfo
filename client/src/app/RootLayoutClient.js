@@ -28,9 +28,9 @@ export default function RootLayoutClient({ children }) {
     setIsAdminRoute(pathname.startsWith("/admin"));
   }, [pathname]);
 
-  useEffect(() => {
-    localStorage.setItem("date", Date.now().toString());
-  }, []);
+  // useEffect(() => {
+  //   localStorage.setItem("date", Date.now().toString());
+  // }, []);
 
   return (
     <html lang="en" className="scroll-smooth">

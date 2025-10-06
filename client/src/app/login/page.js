@@ -40,12 +40,6 @@ export default function LoginPage() {
     setIsMounted(true);
   }, []);
 
-  // useEffect(() => {
-  //   if (inputRef.current) {
-  //     inputRef.current.focus();
-  //   }
-  // }, []);
-
   useEffect(() => {
     if (isMounted && inputRef.current) {
       inputRef.current.focus();
@@ -76,11 +70,20 @@ export default function LoginPage() {
           toast.success("OTP generated successfully. Please check your SMS.");
           setOTPNumber(result?.Data);
         } else {
+          console.log("qwertyuiop");
+
           toast.error(result?.message || "login failed");
         }
       })
       .catch((err) => {
-        toast.error(err);
+        if (err === "User not registered with this number") {
+          toast.error(err);
+          setTimeout(() => {
+            router.push(`/register?mobile=${loginForm.phone}`);
+          }, 200);
+        } else {
+          alert("Login Failed");
+        }
       })
       .finally(() => {
         setIsSigningIn(false);
@@ -238,7 +241,7 @@ export default function LoginPage() {
                         Number Verify...
                       </span>
                     ) : (
-                      "OTP Verification"
+                      " LOGIN WITH OTP"
                     )}
                   </motion.button>
                 </div>

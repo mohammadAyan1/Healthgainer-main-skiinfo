@@ -10,8 +10,10 @@ import Link from "next/link";
 import API from "@/lib/api";
 import { updateCartGuestIdToUserId } from "@/redux/slices/cartSlice";
 import { useRouteHistory } from "@/context/RouteContext";
+import { useSearchParams } from "next/navigation";
 
 export default function RegisterPage() {
+  const searchParams = useSearchParams();
   const { previousPath, secondPreviousPath, currentPath } = useRouteHistory();
   const [isMounted, setIsMounted] = useState(false);
   const [registerForm, setRegisterForm] = useState({
@@ -31,9 +33,20 @@ export default function RegisterPage() {
   const dispatch = useDispatch();
   const { error } = useSelector((state) => state.auth);
 
+  const mobileFromLogin = searchParams.get("mobile");
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (mobileFromLogin) {
+      setRegisterForm((prev) => ({
+        ...prev,
+        mobileNumber: mobileFromLogin,
+      }));
+    }
+  }, [mobileFromLogin]);
 
   useEffect(() => {
     if (error) {
