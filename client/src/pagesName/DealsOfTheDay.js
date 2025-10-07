@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
-// import { useSearchParams } from "next/navigation";
+
 import { useRouteHistory } from "@/context/RouteContext";
 import PlaceOrderForm from "@/components/PlaceOrderForm";
 

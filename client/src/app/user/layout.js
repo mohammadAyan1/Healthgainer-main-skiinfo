@@ -3,7 +3,16 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FiMenu, FiX, FiHome, FiShoppingBag, FiMapPin, FiUser, FiLock, FiLogOut } from "react-icons/fi";
+import {
+  FiMenu,
+  FiX,
+  FiHome,
+  FiShoppingBag,
+  FiMapPin,
+  FiUser,
+  FiLock,
+  FiLogOut,
+} from "react-icons/fi";
 import withAuth from "@/hoc/withAuth";
 
 const DashboardLayout = ({ children }) => {
@@ -34,12 +43,23 @@ const DashboardLayout = ({ children }) => {
 
   const navItems = [
     { href: "/user", label: "Dashboard", icon: <FiHome className="mr-3" /> },
-    { href: "/user/user-orders", label: "My Orders", icon: <FiShoppingBag className="mr-3" /> },
-    { href: "/user/address", label: "My Address", icon: <FiMapPin className="mr-3" /> },
-    { href: "/user/account-details", label: "Account Details", icon: <FiUser className="mr-3" /> },
-    // { href: "/user/change-password", label: "Change Password", icon: <FiLock className="mr-3" /> },
-    { href: "/", label: "Home", icon: <FiHome className="mr-3" /> },
+    {
+      href: "/user/user-orders",
+      label: "My Orders",
+      icon: <FiShoppingBag className="mr-3" />,
+    },
+    {
+      href: "/user/address",
+      label: "My Address",
+      icon: <FiMapPin className="mr-3" />,
+    },
+    {
+      href: "/user/account-details",
+      label: "Account Details",
+      icon: <FiUser className="mr-3" />,
+    },
 
+    { href: "/", label: "Home", icon: <FiHome className="mr-3" /> },
   ];
 
   return (
@@ -58,12 +78,15 @@ const DashboardLayout = ({ children }) => {
       <div className="flex  lg:pt-0">
         {/* Sidebar - Fixed for desktop, overlay for mobile */}
         <div
-          className={`fixed lg:static top-16 md:top-0 inset-0 z-10 lg:z-0 bg-black bg-opacity-50 lg:bg-transparent ${isSidebarOpen ? "block" : "hidden"} lg:block`}
+          className={`fixed lg:static top-16 md:top-0 inset-0 z-10 lg:z-0 bg-black bg-opacity-50 lg:bg-transparent ${
+            isSidebarOpen ? "block" : "hidden"
+          } lg:block`}
           onClick={closeSidebar}
         >
           <aside
-            className={`w-72 h-[90vh] lg:h-[80vh]  md:mt-0 bg-white border-r transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-              } lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col`}
+            className={`w-72 h-[90vh] lg:h-[80vh]  md:mt-0 bg-white border-r transform ${
+              isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+            } lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col`}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4 hidden lg:block border-b">
@@ -75,8 +98,11 @@ const DashboardLayout = ({ children }) => {
                 <Link
                   key={href}
                   href={href}
-                  className={`flex items-center py-3 px-4 rounded-lg ${pathname === href ? "bg-primary text-white" : "hover:bg-gray-100"
-                    }`}
+                  className={`flex items-center py-3 px-4 rounded-lg ${
+                    pathname === href
+                      ? "bg-primary text-white"
+                      : "hover:bg-gray-100"
+                  }`}
                   onClick={closeSidebar}
                 >
                   {icon}
@@ -104,7 +130,7 @@ const DashboardLayout = ({ children }) => {
             {/* <div className="hidden lg:block mb-6">
               <h1 className="text-2xl font-bold">Dashboard</h1>
             </div> */}
-            
+
             <div className="bg-white rounded-lg shadow-sm py-4 lg:p-6">
               {children}
             </div>

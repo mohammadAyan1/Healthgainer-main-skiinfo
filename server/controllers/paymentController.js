@@ -15,7 +15,7 @@ const razorpay = new Razorpay({
 exports.createPaymentOrder = async (req, res) => {
   try {
     const { addressId, note, type } = req.body;
-    console.log(req.body);
+    console.log(req.body, "this is create payment ");
 
     const { price } = req.body.items[0];
     console.log(price);
@@ -107,11 +107,24 @@ exports.handlePaymentVerify = async (req, res) => {
     } = req.body;
     const userId = req.id;
 
-    //added after change
+    console.log(req.body, "this is verify ");
+
     const convertPrice = (priceString) => {
       if (!priceString) return 0;
-      // Remove any non-digit characters except dot
-      const numeric = Number(priceString.toString().replace(/[^0-9.]/g, ""));
+
+      // Remove currency symbols, spaces, and trailing "/-"
+      const cleaned = priceString
+        .toString()
+        .replace(/Rs\.?/gi, "") // remove "Rs" or "Rs."
+        .replace(/\/-/, "") // remove "/-"
+        .trim(); // remove extra spaces
+
+      // Convert to number
+      const numeric = Number(cleaned);
+
+      console.log(priceString, "→ cleaned:", cleaned, "→ numeric:", numeric);
+
+      // If it's not a number, return 0
       return isNaN(numeric) ? 0 : numeric;
     };
 
@@ -215,7 +228,6 @@ exports.handlePaymentVerify = async (req, res) => {
           title: item.title, // save it
           subtitle: item.subtitle, // save it
           quantity: item.quantity,
-          // price: item.price,
           price: convertPrice(item.price),
         })),
 
@@ -242,8 +254,6 @@ exports.handlePaymentVerify = async (req, res) => {
     if (type !== "viewplan") {
       await Cart.findOneAndUpdate({ userId }, { items: [] });
     }
-
-    console.log(savedOrder);
 
     res.status(200).json({ success: true, orderId: savedOrder._id.toString() });
   } catch (err) {

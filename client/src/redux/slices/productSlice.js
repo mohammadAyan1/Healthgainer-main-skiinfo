@@ -149,20 +149,7 @@ const productSlice = createSlice({
       // update product
       .addCase(updateProduct.fulfilled, (state, action) => {
         state.product = action.payload;
-        // const index = state.products.findIndex(
-        //   (p) => p._id === action.payload._id
-        // );
-        // if (index !== -1) state.products[index] = action.payload;
-        // console.log(action);
       })
-
-      // delete product
-      // .addCase(deleteProduct.fulfilled, (state, action) => {
-      //   state.products = state?.products?.filter(
-      //     (p) => p._id !== action.payload
-      //   );
-      //   if (state.product?._id === action.payload) state.product = null;
-      // });
 
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.deleteStatus = action.payload;

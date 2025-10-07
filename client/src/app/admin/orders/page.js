@@ -228,61 +228,6 @@ export default function Orders() {
     return filtered;
   }, [orders, searchQuery, dateFilter, sortConfig]);
 
-  // const filteredAndSortedOrders = useMemo(() => {
-  //   let filtered = orders.filter((order) => {
-  //     const query = searchQuery.toLowerCase();
-
-  //     // Text search across multiple fields :cite[2]:cite[7]
-  //     const matchesSearch =
-  //       order?.userId?.firstName?.toLowerCase().includes(query) ||
-  //       order?._id?.toString().includes(query) ||
-  //       order?.orderNumber?.toString().toLowerCase().includes(query) ||
-  //       order?.status?.toLowerCase().includes(query) ||
-  //       `${order?.userId?.firstName || ""} ${order?.userId?.lastName || ""}`
-  //         .toLowerCase()
-  //         .includes(query);
-
-  //     // Date range filter :cite[1]:cite[3]
-  //     const orderDate = new Date(order.createdAt);
-  //     const fromDate = dateFilter.from ? new Date(dateFilter.from) : null;
-  //     const toDate = dateFilter.to ? new Date(dateFilter.to) : null;
-
-  //     let matchesDate = true;
-  //     if (fromDate) {
-  //       // Set to beginning of the day for from date
-  //       fromDate.setHours(0, 0, 0, 0);
-  //       matchesDate = matchesDate && orderDate >= fromDate;
-  //     }
-  //     if (toDate) {
-  //       // Set to end of the day for to date
-  //       toDate.setHours(23, 59, 59, 999);
-  //       matchesDate = matchesDate && orderDate <= toDate;
-  //     }
-
-  //     return matchesSearch && matchesDate;
-  //   });
-
-  //   // Sorting logic (unchanged)
-  //   if (sortConfig.key) {
-  //     filtered.sort((a, b) => {
-  //       const aVal = sortConfig.key.includes(".")
-  //         ? sortConfig.key.split(".").reduce((obj, key) => obj?.[key], a)
-  //         : a[sortConfig.key];
-  //       const bVal = sortConfig.key.includes(".")
-  //         ? sortConfig.key.split(".").reduce((obj, key) => obj?.[key], b)
-  //         : b[sortConfig.key];
-
-  //       if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-  //       if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-  //       return 0;
-  //     });
-  //   }
-
-  //   return filtered;
-  // }, [orders, searchQuery, sortConfig, dateFilter]);
-
- 
- 
   const totalPages = Math.ceil(filteredAndSortedOrders.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;

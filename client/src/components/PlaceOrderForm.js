@@ -11,11 +11,15 @@ import {
   loginUser,
 } from "@/redux/slices/authSlice";
 import { updateCartGuestIdToUserId } from "@/redux/slices/cartSlice";
+import { useRouter } from "next/navigation";
+
 import { addAddress } from "@/redux/slices/addressSlice";
 import axios from "@/lib/api";
 
 const PlaceOrderForm = () => {
   const user = useSelector((state) => state.auth.user);
+
+  const router = useRouter();
 
   const { setShowPlaceOrder } = useRouteHistory();
   const dispatch = useDispatch();
@@ -337,8 +341,9 @@ const PlaceOrderForm = () => {
 
             if (verifyRes.data.success) {
               onSuccess(verifyRes.data.orderId);
+              setShowPlaceOrder(false);
             } else {
-              alert("Payment verification failed. Order not created.");
+              alert("Payment verification failed. Order not created. asdfghjk");
             }
           } catch (err) {
             console.error(err);

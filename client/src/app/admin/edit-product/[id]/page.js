@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProductById, updateProduct } from "@/redux/slices/productSlice";
 import dynamic from "next/dynamic";
 
-// const { toast } = dynamic(() => import("react-toastify"), { ssr: false });
 import { toast } from "react-toastify";
 
 export default function EditProduct() {

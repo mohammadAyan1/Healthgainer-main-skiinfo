@@ -22,7 +22,6 @@ export const loginUser = createAsyncThunk(
       const { data } = await API.post("/auth/login", userData);
       // Token is set as httpOnly cookie by backend; only persist user locally
       localStorage.setItem("user", JSON.stringify(data.user));
-      // localStorage.setItem("user", JSON.stringify(data.user));
 
       // Store token for withAuth
       localStorage.setItem("token", data.token); // <-- add this
@@ -38,7 +37,7 @@ export const getOTPLogin = createAsyncThunk(
   "auth/getotplogin",
   async (userData, thunkAPI) => {
     console.log(userData);
-    
+
     try {
       const { data } = await API.post("/auth/getotplogin", userData);
       // Token is set as httpOnly cookie by backend; only persist user locally

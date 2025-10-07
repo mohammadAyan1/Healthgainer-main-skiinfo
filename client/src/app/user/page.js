@@ -14,7 +14,6 @@ import {
 
 export default function ProfilePage() {
   const [userData, setUserData] = useState(null);
-  
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -25,12 +24,10 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    
     const storedUser = localStorage.getItem("user");
-    
 
     if (storedUser) {
-      setUserData(JSON.parse(storedUser) );
+      setUserData(JSON.parse(storedUser));
     }
   }, []);
 
@@ -43,10 +40,8 @@ export default function ProfilePage() {
   };
 
   const handleSave = () => {
-    
     const updatedUser = { ...userData, ...formData };
     localStorage.setItem("user", JSON.stringify(updatedUser));
-    
 
     setUserData(updatedUser);
     setIsEditing(false);
@@ -141,7 +136,7 @@ export default function ProfilePage() {
                   />
                 </div>
               ) : (
-                `${firstName} ${lastName}`
+                `${firstName} ${lastName ? lastName : ""}`
               )}
             </h1>
           </div>

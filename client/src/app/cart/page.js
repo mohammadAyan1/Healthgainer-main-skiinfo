@@ -21,7 +21,6 @@ export default function CartPage() {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  // const cartItems = useSelector((state) => state.cart.items || []);
   const cartItems = useSelector((state) =>
     Array.isArray(state.cart.items) ? state.cart.items : []
   );
@@ -95,10 +94,6 @@ export default function CartPage() {
     dispatch(emptyCart(payload));
   };
 
-  // const calculateTotal = () =>
-  //   cartItems.reduce((total, item) => total + item.price * item.quantity, 0) ||
-  //   0;
-
   const calculateTotal = () =>
     Array.isArray(cartItems)
       ? cartItems.reduce(
@@ -106,13 +101,6 @@ export default function CartPage() {
           0
         )
       : 0;
-
-  // const calculateSavings = () =>
-  //   cartItems.reduce(
-  //     (total, item) =>
-  //       total + ((item.mrp || 0) - (item.price || 0)) * (item.quantity || 0),
-  //     0
-  //   ) || 0;
 
   const calculateSavings = () =>
     Array.isArray(cartItems)
@@ -166,7 +154,6 @@ export default function CartPage() {
                 <div className="p-4 border-b flex justify-between items-center">
                   <h2 className="text-lg font-medium">Cart Items</h2>
                   <button
-                    //onClick={() => dispatch(emptyCart(user._id))}
                     onClick={() => emptyCartHandler()}
                     className="text-sm text-red-600 hover:text-red-800 font-medium"
                   >

@@ -221,7 +221,7 @@ export default function Products() {
   // Fetch all products
   useEffect(() => {
     dispatch(fetchProducts());
-  }, [dispatch,deleteStatus]);
+  }, [dispatch, deleteStatus]);
 
   // Fetch single product by ID (for details page)
   useEffect(() => {
@@ -236,10 +236,6 @@ export default function Products() {
       return [single, ...list];
     return list;
   }, [products]);
-
-  // const mergedProducts = useMemo(() => {
-  //   return products || [];
-  // }, [products]);
 
   const processedProducts = useMemo(() => {
     const filtered = mergedProducts?.filter((p) => {
@@ -292,8 +288,7 @@ export default function Products() {
         await dispatch(deleteProduct(productId)).unwrap();
         if (deleteStatus) {
           toast.success("Product deleted successfully"); // red toast
-          dispatch(fetchProducts())
-          
+          dispatch(fetchProducts());
         }
       } catch (err) {
         // toast.error("Error deleting product");
