@@ -64,7 +64,6 @@ const AddressSection = ({
           updateAddress({ id: currentAddress._id, ...currentAddress })
         ).unwrap();
       } else {
-        console.log("asdfghjk");
         const user = JSON.parse(localStorage.getItem("user")) || null;
         if (user) {
           await dispatch(addAddress(currentAddress)).unwrap();

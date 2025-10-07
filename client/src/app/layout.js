@@ -1,7 +1,7 @@
 import LoadingOverlay from "@/components/LoadingOverlay";
 import RootLayoutClient from "./RootLayoutClient";
 import { RouteProvider } from "@/context/RouteContext";
-
+// import PlaceOrderForm from "@/components/PlaceOrderForm";
 export const metadata = {
   title: "HealthGainer – Build Muscle. Boost Energy.",
   description:
@@ -15,6 +15,7 @@ export default function RootLayout({ children }) {
   return (
     <RootLayoutClient>
       <LoadingOverlay />
+      {/* <PlaceOrderForm/> */}
       <RouteProvider>{children}</RouteProvider>
     </RootLayoutClient>
   );

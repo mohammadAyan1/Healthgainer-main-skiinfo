@@ -1,56 +1,64 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API from "../../lib/api";
 
 export const fetchAddresses = createAsyncThunk(
-  'address/fetch',
+  "address/fetch",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await API.get('/addresses/');
+      const response = await API.get("/addresses/");
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch addresses');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch addresses"
+      );
     }
   }
 );
 
 export const addAddress = createAsyncThunk(
-  'address/add',
+  "address/add",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await API.post('/addresses/add/', data);
-      return response.data; 
+      const response = await API.post("/addresses/add/", data);
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to add address');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to add address"
+      );
     }
   }
 );
 
 export const updateAddress = createAsyncThunk(
-  'address/update',
+  "address/update",
   async ({ id, ...data }, { rejectWithValue }) => {
     try {
       const response = await API.put(`/addresses/update/${id}`, data);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to update address');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update address"
+      );
     }
   }
 );
 
 export const deleteAddress = createAsyncThunk(
-  'address/delete',
+  "address/delete",
   async (addressId, { rejectWithValue }) => {
     try {
       await API.delete(`/addresses/delete/${addressId}`);
       return addressId;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to delete address');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete address"
+      );
     }
   }
 );
 
 const addressSlice = createSlice({
-  name: 'address',
+  name: "address",
   initialState: {
     addresses: [],
     loading: false,
@@ -59,7 +67,7 @@ const addressSlice = createSlice({
   reducers: {
     clearAddressError: (state) => {
       state.error = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -95,7 +103,9 @@ const addressSlice = createSlice({
       })
       .addCase(updateAddress.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.addresses.findIndex(a => a._id === action.payload._id);
+        const index = state.addresses.findIndex(
+          (a) => a._id === action.payload._id
+        );
         if (index !== -1) {
           state.addresses[index] = action.payload;
         }
@@ -110,13 +120,15 @@ const addressSlice = createSlice({
       })
       .addCase(deleteAddress.fulfilled, (state, action) => {
         state.loading = false;
-        state.addresses = state.addresses.filter(a => a._id !== action.payload);
+        state.addresses = state.addresses.filter(
+          (a) => a._id !== action.payload
+        );
       })
       .addCase(deleteAddress.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
-  }
+  },
 });
 
 export const { clearAddressError } = addressSlice.actions;

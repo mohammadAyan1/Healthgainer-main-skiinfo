@@ -11,9 +11,13 @@ import { useRouter } from "next/navigation";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
-import { toast } from "react-toastify";
+// import { useSearchParams } from "next/navigation";
+import { useRouteHistory } from "@/context/RouteContext";
+import PlaceOrderForm from "@/components/PlaceOrderForm";
 
 export default function DealsOfTheDay() {
+  const { showPlaceOrder, setShowPlaceOrder } = useRouteHistory();
+
   const dispatch = useDispatch();
   const { deals, loading } = useSelector((state) => state.deals);
 
@@ -49,16 +53,31 @@ export default function DealsOfTheDay() {
     }).toString();
 
     const targetRoute = `/checkout?${query}`;
-    // if (user) {
-    router.push(targetRoute);
-    // } else {
-    //   localStorage.setItem("redirectAfterLogin", targetRoute);
-    //   toast.warn("Please login to continue!", {
-    //     position: "top-center",
-    //     autoClose: 3000,
-    //   });
-    //   router.push(`/login`);
-    // }
+    if (user) {
+      router.push(targetRoute);
+    } else {
+      const targetDeal = {
+        title: deal.title,
+        price: deal.price,
+        quantity: deal.quantity,
+        subtitle: deal.subtitle,
+        type: "viewPlan",
+        productId: deal._id,
+        createdAt: deal.createdAt,
+        image: deal.image,
+      };
+
+      localStorage.setItem("redirectAfterLogin", JSON.stringify(targetDeal));
+
+      // localStorage.setItem("redirectAfterLogin", JSON.stringify(targetRoute));
+      // toast.warn("Please login to continue!", {
+      //   position: "top-center",
+      //   autoClose: 3000,
+      // });
+      // router.push(`/login`);
+      setShowPlaceOrder(true);
+      // router.push(`/placeorder`);
+    }
   };
 
   if (loading || !deals.length) {
@@ -68,6 +87,7 @@ export default function DealsOfTheDay() {
 
   return (
     <div className="bg-[#060606] py-10 px-4 md:px-20 overflow-hidden font-sans relative">
+      {showPlaceOrder && <PlaceOrderForm />}
       <div className="mb-6 text-center">
         <h2 className="text-4xl px-4 md:text-5xl font-light py-2 text-white">
           Deal of the <span className="text-lime-500 font-bold">Day</span>

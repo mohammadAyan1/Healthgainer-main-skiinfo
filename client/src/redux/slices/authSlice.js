@@ -37,6 +37,8 @@ export const loginUser = createAsyncThunk(
 export const getOTPLogin = createAsyncThunk(
   "auth/getotplogin",
   async (userData, thunkAPI) => {
+    console.log(userData);
+    
     try {
       const { data } = await API.post("/auth/getotplogin", userData);
       // Token is set as httpOnly cookie by backend; only persist user locally

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect,useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 const RouteContext = createContext();
@@ -8,6 +8,7 @@ const RouteContext = createContext();
 export function RouteProvider({ children }) {
   const pathname = usePathname();
   const [history, setHistory] = useState([]);
+  const [showPlaceOrder, setShowPlaceOrder] = useState(false);
 
   useEffect(() => {
     setHistory((prev) => {
@@ -22,6 +23,8 @@ export function RouteProvider({ children }) {
         currentPath: pathname,
         previousPath: history[history.length - 2] || null,
         secondPreviousPath: history[history.length - 3] || null,
+        setShowPlaceOrder,
+        showPlaceOrder,
       }}
     >
       {children}

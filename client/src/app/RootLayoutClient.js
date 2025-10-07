@@ -28,10 +28,6 @@ export default function RootLayoutClient({ children }) {
     setIsAdminRoute(pathname.startsWith("/admin"));
   }, [pathname]);
 
-  // useEffect(() => {
-  //   localStorage.setItem("date", Date.now().toString());
-  // }, []);
-
   return (
     <html lang="en" className="scroll-smooth">
       <body
@@ -39,6 +35,7 @@ export default function RootLayoutClient({ children }) {
       >
         <Providers>
           {!isAdminRoute && <Navbar />}
+
           <main>
             <ToastContainer
               position="top-right"

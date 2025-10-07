@@ -4,6 +4,7 @@ const Address = require("../models/addressModel");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const DealModel = require("../models/deal/DealModel");
+const { log } = require("console");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -14,7 +15,10 @@ const razorpay = new Razorpay({
 exports.createPaymentOrder = async (req, res) => {
   try {
     const { addressId, note, type } = req.body;
+    console.log(req.body);
+
     const { price } = req.body.items[0];
+    console.log(price);
 
     const userId = req.id;
     let cart;
@@ -51,6 +55,13 @@ exports.createPaymentOrder = async (req, res) => {
       }, 0);
     }
 
+    const numericPrice = Math.round(
+      Number(price.toString().replace(/[^0-9]/g, "")) * 100
+    );
+
+    console.log("Price raw:", price);
+    console.log("Price numeric (paise):", numericPrice);
+
     // Create Razorpay order
     let razorpayOrder;
     if (type !== "viewPlan") {
@@ -61,7 +72,7 @@ exports.createPaymentOrder = async (req, res) => {
       });
     } else {
       razorpayOrder = await razorpay.orders.create({
-        amount: price * 100,
+        amount: numericPrice,
         currency: "INR",
         receipt: `receipt_${Date.now()}`,
       });
@@ -95,6 +106,14 @@ exports.handlePaymentVerify = async (req, res) => {
       productSet,
     } = req.body;
     const userId = req.id;
+
+    //added after change
+    const convertPrice = (priceString) => {
+      if (!priceString) return 0;
+      // Remove any non-digit characters except dot
+      const numeric = Number(priceString.toString().replace(/[^0-9.]/g, ""));
+      return isNaN(numeric) ? 0 : numeric;
+    };
 
     const hmac = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
     hmac.update(`${razorpay_order_id}|${razorpay_payment_id}`);
@@ -162,10 +181,12 @@ exports.handlePaymentVerify = async (req, res) => {
             productId: product._id,
             variantId: item.variantId || null,
             quantity: item.quantity,
-            price,
+            price: convertPrice(price),
+            // price,
           };
         }),
-        totalAmount,
+        // totalAmount,
+        totalAmount: convertPrice(totalAmount),
         address: {
           fullName: address.fullName,
           phone: address.phone,
@@ -194,10 +215,11 @@ exports.handlePaymentVerify = async (req, res) => {
           title: item.title, // save it
           subtitle: item.subtitle, // save it
           quantity: item.quantity,
-          price: item.price,
+          // price: item.price,
+          price: convertPrice(item.price),
         })),
 
-        totalAmount: req.body.productSet[0]?.price,
+        totalAmount: convertPrice(req.body.productSet[0]?.price),
         address: {
           fullName: address.fullName,
           phone: address.phone,
