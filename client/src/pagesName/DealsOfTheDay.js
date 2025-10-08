@@ -86,7 +86,10 @@ export default function DealsOfTheDay() {
   const sortedDeals = [...deals].sort((a, b) => a.sno - b.sno);
 
   return (
-    <div className="bg-[#060606] py-10 px-4 md:px-20 overflow-hidden font-sans relative">
+    <div
+      id="deals-of-the-day"
+      className="bg-[#060606] py-10 px-4 md:px-20 overflow-hidden font-sans relative"
+    >
       {showPlaceOrder && <PlaceOrderForm />}
       <div className="mb-6 text-center">
         <h2 className="text-4xl px-4 md:text-5xl font-light py-2 text-white">

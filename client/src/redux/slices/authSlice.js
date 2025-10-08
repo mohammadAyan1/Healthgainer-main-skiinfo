@@ -166,6 +166,7 @@ export const todayLogins = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const { data } = await API.get("/auth/todayLogins");
+      console.log(data.users);
 
       return data.users;
     } catch (error) {

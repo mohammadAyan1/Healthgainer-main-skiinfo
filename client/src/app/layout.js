@@ -1,5 +1,3 @@
-
-
 import LoadingOverlay from "@/components/LoadingOverlay";
 import RootLayoutClient from "./RootLayoutClient";
 import { RouteProvider } from "@/context/RouteContext";

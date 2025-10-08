@@ -1,3 +1,4 @@
+"use client";
 import BestSupplementSection from "@/pagesName/BestSupplementSection";
 import HeroSection from "@/pagesName/HeroSection";
 import InfiniteScrollText from "@/pagesName/InfiniteScrollText";
@@ -14,8 +15,30 @@ import AyurvedicWeightGainer from "@/pagesName/AyurvedicWeightGainer";
 import HealthGainerBenefits from "@/pagesName/HealthGainerBenefits";
 import NaturalHerbs from "@/pagesName/NaturalHerbs";
 import KeywordCloud from "./keyword/page";
+import { useEffect } from "react";
 
 const page = () => {
+  useEffect(() => {
+    // Only run in the browser
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash;
+      console.log(hash);
+
+      if (hash) {
+        console.log("dfghjk");
+        
+        setTimeout(() => {
+          const element = document.querySelector(hash);
+          console.log(element);
+
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth" });
+          }
+        }, 1100); // 100ms delay
+      }
+    }
+  }, []);
+
   return (
     <div>
       <HeroSection />

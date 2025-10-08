@@ -48,6 +48,8 @@ routes.post("/", async (req, res) => {
 routes.post("/resend", async (req, res) => {
   try {
     const { phone, OTPNumber } = req.body;
+    console.log(phone);
+    console.log(OTPNumber);
 
     if (!phone) {
       res.status(405).json({

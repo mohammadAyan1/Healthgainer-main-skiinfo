@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useRouteHistory } from "@/context/RouteContext";
 import Image from "next/image";
 import { toast } from "react-toastify";
@@ -10,37 +10,21 @@ import {
   registerUser,
   loginUser,
 } from "@/redux/slices/authSlice";
-import { updateCartGuestIdToUserId } from "@/redux/slices/cartSlice";
-import { useRouter } from "next/navigation";
-
 import { addAddress } from "@/redux/slices/addressSlice";
 import axios from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 const PlaceOrderForm = () => {
   const user = useSelector((state) => state.auth.user);
-
   const router = useRouter();
-
   const { setShowPlaceOrder } = useRouteHistory();
   const dispatch = useDispatch();
-  const [OTPNumber, setOTPNumber] = useState("");
-  const [selectFn, setSelectFn] = useState(false);
-  const [register, setRegister] = useState({});
-  const [address, setAddress] = useState(null);
+  const otpRef = useRef(null);
 
-  const initial = {
-    createdAt: "",
-    image: "",
-    price: "",
-    quantity: "",
-    sno: "",
-    subtitle: "",
-    tag: "",
-    title: "",
-    type: "",
-    updatedAt: "",
-    _id: "",
-  };
+  const [OTPNumber, setOTPNumber] = useState("");
+  const [inputOTP, setInputOTP] = useState("");
+  const [isOTPVerified, setIsOTPVerified] = useState(false);
+  const [otpStatus, setOtpStatus] = useState(""); // "success" | "error" | ""
 
   const [loginForm, setLoginForm] = useState({
     name: "",
@@ -51,7 +35,9 @@ const PlaceOrderForm = () => {
     state: "",
   });
 
-  const [showDealOfTheDay, setShowDealOfTheDay] = useState(initial);
+  const [showDealOfTheDay, setShowDealOfTheDay] = useState({});
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerated, setIsGenerated] = useState(false);
 
   useEffect(() => {
     const redirectRoute = localStorage.getItem("redirectAfterLogin");
@@ -60,8 +46,6 @@ const PlaceOrderForm = () => {
       setShowDealOfTheDay(parsedDeal);
     }
   }, []);
-
-  console.log(showDealOfTheDay);
 
   const itemsToShow = [
     {
@@ -73,226 +57,93 @@ const PlaceOrderForm = () => {
     },
   ];
 
-  console.log(itemsToShow);
-
-  // Debounce helper
-  function debounce(func, delay) {
-    let timeoutId;
-    return function (...args) {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        func.apply(this, args);
-      }, delay);
-    };
-  }
-
-  // Always use latest value by passing the phone explicitly
-  const handleGenerateOTP = async (currentLoginForm) => {
-    setRegister(currentLoginForm);
-    if (!currentLoginForm.phone) {
-      toast.error("Please fill in all fields");
+  // ✅ Generate or resend OTP
+  const handleGenerateOrResendOTP = async () => {
+    const { name, phone } = loginForm;
+    if (!phone.trim()) {
+      toast.error("Please enter your phone number");
+      return;
+    }
+    if (phone.trim().length !== 10 || isNaN(phone.trim())) {
+      toast.error("Mobile number must be 10 digits");
       return;
     }
 
-    console.log(currentLoginForm, "current loginForm");
-
-    dispatch(getOTPLogin(currentLoginForm))
-      .unwrap()
-      .then((result) => {
-        if (result?.success) {
-          toast.success("OTP generated successfully. Please check your SMS.");
-          setSelectFn(true);
-          setOTPNumber(result?.Data);
-        } else {
-          toast.error(result?.message || "login failed");
-        }
-      })
-      .catch((err) => {
-        if (err === "User not registered with this number") {
-          const { name, phone } = currentLoginForm;
-          console.log(name);
-          console.log(phone);
-
-          console.log("asdfghjkl");
-
-          if (!name.trim() || !phone.trim()) {
-            toast.error("Please fill in all fields");
-            return;
-          }
-
-          if (phone.trim().length !== 10 || isNaN(phone.trim())) {
-            toast.error("Mobile number must be 10 digits");
-            return;
-          }
-
-          dispatch(getOTP({ firstName: name, mobileNumber: phone }))
-            .unwrap()
-            .then((res) => {
-              if (res?.success) {
-                setOTPNumber(res?.Data);
-              }
-
-              toast.success("OTP generated successfull");
-            })
-            .catch((err) => {
-              toast.error(err || "Registration failed");
-            });
-        } else {
-          alert("Login Failed");
-        }
-      })
-      .finally(() => {});
-  };
-
-  const checkOTPFunction = (inputOTP, realOTP) => {
-    console.log(inputOTP);
-    console.log(realOTP);
-
-    if (inputOTP == realOTP) {
-      console.log("this login function");
-
-      dispatch(loginUser({ loginForm }))
-        .unwrap()
-        .then(async (res) => {
-          if (res?.success) {
-            const GuestIdCheck = localStorage.getItem("guestId");
-            const UserId = res.user._id;
-
-            if (GuestIdCheck) {
-              try {
-                const result = await dispatch(
-                  updateCartGuestIdToUserId({ GuestIdCheck, UserId })
-                ).unwrap();
-
-                console.log("Cart updated:", result);
-
-                // ✅ Remove guest cart id from localStorage after success
-                localStorage.removeItem("guestId");
-              } catch (err) {
-                console.error("Error merging cart:", err);
-              }
-            }
-
-            console.log(user);
-            console.log(UserId);
-
-            console.log(loginForm);
-
-            await dispatch(
-              addAddress({
-                fullName: loginForm.name,
-                phone: loginForm.phone,
-                street: loginForm.street,
-                city: loginForm.CITY,
-                state: loginForm.state,
-                zipCode: loginForm.PIN,
-                country: "India",
-                isDefault: true,
-              })
-            )
-              .unwrap()
-              .then(async (res) => {
-                if (res?.success) {
-                  console.log(res);
-                  setAddress(res.address?._id);
-
-                  toast.success("address added success full");
-                  setTimeout(() => {
-                    toast.warn("Order will be shipped on this address");
-                  }, 300);
-                }
-              });
-
-            toast.success("OTP Configuration successfull!");
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        })
-        .finally(() => {});
-    } else {
-      toast.error("Wrong OTP !");
-    }
-  };
-
-  const confirmOTP = async (inputOTP, realOTP) => {
+    setIsGenerating(true);
     try {
-      console.log(inputOTP);
-      console.log(realOTP);
-
-      console.log("this is registration form");
-
-      if (inputOTP == realOTP) {
-        const { name, phone } = loginForm;
-        console.log(loginForm);
-
-        dispatch(registerUser({ firstName: name, mobileNumber: phone }))
-          .unwrap()
-          .then(async (res) => {
-            if (res?.success) {
-              const GuestIdCheck = localStorage.getItem("guestId");
-              const UserId = res.user._id;
-              if (GuestIdCheck) {
-                try {
-                  const result = await dispatch(
-                    updateCartGuestIdToUserId({ GuestIdCheck, UserId })
-                  ).unwrap();
-
-                  console.log("Cart updated:", result);
-
-                  // ✅ Remove guest cart id from localStorage after success
-                  localStorage.removeItem("guestId");
-                  // updateAddress({ id: currentAddress._id, ...currentAddress });
-                } catch (err) {
-                  console.error("Error merging cart:", err);
-                }
-              }
-
-              await dispatch(
-                addAddress({
-                  fullName: loginForm.name,
-                  phone: loginForm.phone,
-                  street: loginForm.street,
-                  city: loginForm.CITY,
-                  state: loginForm.state,
-                  zipCode: loginForm.PIN,
-                  country: "India",
-                  isDefault: true,
-                })
-              )
-                .unwrap()
-                .then(async (res) => {
-                  if (res?.success) {
-                    console.log(res);
-                    setAddress(res.address?._id);
-
-                    toast.success("address added success full");
-                    setTimeout(() => {
-                      toast.warn("Order will be shipped on this address");
-                    }, 300);
-                  }
-                });
-              toast.success("OTP Configuration successfull!");
-            }
-          });
+      const result = await dispatch(getOTPLogin({ phone })).unwrap();
+      if (result?.success) {
+        toast.success("OTP sent successfully!");
+        setOTPNumber(result?.Data);
+        setIsGenerated(true);
       } else {
-        toast.error("Wrong OTP");
+        toast.error(result?.message || "Login failed, trying registration...");
+        throw new Error("Try register");
       }
-    } catch (error) {
+    } catch (err) {
+      if (
+        err == "User not registered with this number" ||
+        err.message === "Try register"
+      ) {
+        const regRes = await dispatch(
+          getOTP({ firstName: name, mobileNumber: phone })
+        ).unwrap();
+        if (regRes?.success) {
+          toast.success("User registered and OTP sent!");
+          setOTPNumber(regRes?.Data);
+          setIsGenerated(true);
+        } else {
+          toast.error("Registration failed");
+        }
+      } else {
+        toast.error("Failed to generate OTP");
+      }
     } finally {
+      setIsGenerating(false);
     }
   };
 
-  // Create debounced versions
-  const debouncedGenerateOTP = useCallback(
-    debounce(handleGenerateOTP, 1000),
-    []
-  );
-  const debouncedConfirmOTP = useCallback(
-    debounce(selectFn ? checkOTPFunction : confirmOTP, 1000),
-    [selectFn]
-  );
+  // ✅ Confirm OTP
+  const handleConfirmOTP = async () => {
+    if (inputOTP.trim() === "") {
+      toast.error("Please enter OTP");
+      return;
+    }
 
+    if (inputOTP != OTPNumber) {
+      toast.error("Invalid OTP");
+      setOtpStatus("error");
+      otpRef.current?.focus();
+      return;
+    }
+
+    const { name, phone } = loginForm;
+    try {
+      const res = await dispatch(loginUser({ loginForm })).unwrap();
+      if (res?.success) {
+        toast.success("OTP verified successfully!");
+        setIsOTPVerified(true);
+        setOtpStatus("success");
+      }
+    } catch (err) {
+      if (err == "User not found") {
+        const regRes = await dispatch(
+          registerUser({ firstName: name, mobileNumber: phone })
+        ).unwrap();
+        if (regRes?.success) {
+          toast.success("Registered and OTP verified successfully!");
+          setIsOTPVerified(true);
+          setOtpStatus("success");
+        }
+      } else {
+        toast.error("Verification failed");
+        setOtpStatus("error");
+        otpRef.current?.focus();
+      }
+    }
+  };
+
+  // ✅ Payment functions
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       const script = document.createElement("script");
@@ -303,7 +154,7 @@ const PlaceOrderForm = () => {
     });
   };
 
-  const handlePayment = async ({ amount, user, onSuccess }) => {
+  const handlePayment = async ({ amount, user, onSuccess, addressId }) => {
     const isSDKLoaded = await loadRazorpayScript();
     if (!isSDKLoaded) {
       alert("Failed to load Razorpay SDK");
@@ -314,12 +165,10 @@ const PlaceOrderForm = () => {
       const { data } = await axios.post("/payment/order", {
         amount,
         items: itemsToShow,
-        addressId: address,
+        addressId,
         note: "",
         type: "viewPlan",
       });
-
-      console.log(data);
 
       const options = {
         key: "rzp_test_RNVfuvBSKZ0E85",
@@ -331,23 +180,20 @@ const PlaceOrderForm = () => {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
-              addressId: address,
+              addressId,
               note: "",
               productSet: itemsToShow,
               type: "viewPlan",
             });
 
-            console.log(verifyRes);
-
             if (verifyRes.data.success) {
               onSuccess(verifyRes.data.orderId);
               setShowPlaceOrder(false);
             } else {
-              alert("Payment verification failed. Order not created. asdfghjk");
+              alert("Payment verification failed.");
             }
-          } catch (err) {
-            console.error(err);
-            alert("Payment verification failed. Order not created.");
+          } catch {
+            alert("Payment verification failed.");
           }
         },
         prefill: { name: user?.name, email: user?.email },
@@ -356,34 +202,91 @@ const PlaceOrderForm = () => {
 
       const rzp = new window.Razorpay(options);
       rzp.open();
-    } catch (err) {
-      console.error("Order creation failed:", err);
-      alert("Something went wrong.");
+    } catch {
+      toast.error("Something went wrong during payment");
     }
   };
 
+  // ✅ Place Order
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
-    try {
-      console.log(user, "qwertyuiopasdfghjklzxcvbnm");
 
-      await handlePayment({
-        amount: showDealOfTheDay.price * 100,
-        user,
-        onSuccess: (orderId) => {
-          console.log(orderId);
-          router.push(`/orderConfirmation/${orderId}`);
-        },
+    if (!isOTPVerified) {
+      toast.error("Please verify OTP first");
+      return;
+    }
+
+    const { name, phone, street, PIN, CITY, state } = loginForm;
+    if (!name || !phone || !street || !PIN || !CITY || !state) {
+      toast.error("Please fill all address fields");
+      return;
+    }
+
+    try {
+      const res = await dispatch(
+        addAddress({
+          fullName: name,
+          phone,
+          street,
+          city: CITY,
+          state,
+          zipCode: PIN,
+          country: "India",
+          isDefault: true,
+        })
+      ).unwrap();
+
+      if (res?.success) {
+        toast.success("Address added successfully!");
+        const addressId = res.address?._id;
+
+        await handlePayment({
+          amount: showDealOfTheDay.price * 100,
+          user,
+          onSuccess: (orderId) => router.push(`/orderConfirmation/${orderId}`),
+          addressId,
+        });
+      }
+    } catch {
+      toast.error("Order failed");
+    }
+  };
+
+  // ✅ Enable Place Order only if OTP verified + all address filled
+  const isFormComplete =
+    isOTPVerified &&
+    loginForm.name &&
+    loginForm.phone &&
+    loginForm.street &&
+    loginForm.PIN &&
+    loginForm.CITY &&
+    loginForm.state;
+
+  const resendOTP = async () => {
+    console.log("bnm");
+
+    const { phone } = loginForm;
+    console.log(phone);
+    console.log(OTPNumber);
+
+    try {
+      const res = await axios.post("/getOTP/resend", {
+        phone: loginForm.phone,
+        OTPNumber,
       });
-    } catch (err) {
-      console.error(err);
+      if (res?.status) {
+        toast.success("OTP resent successfully. Please check your SMS.");
+        setOTPNumber(res?.data?.Data);
+      }
+    } catch (error) {
+      console.error(error);
     } finally {
     }
   };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md md:max-w-lg lg:max-w-xl p-6 md:p-8 relative overflow-y-auto max-h-[90vh]">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative overflow-y-auto max-h-[90vh]">
         <button
           onClick={() => setShowPlaceOrder(false)}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl"
@@ -395,8 +298,9 @@ const PlaceOrderForm = () => {
           Place Your Order
         </h2>
 
+        {/* Product Info */}
         <div className="flex items-center gap-4 mb-6">
-          <div className="relative w-32 h-32 md:w-40 md:h-40">
+          <div className="relative w-32 h-32">
             <Image
               src={showDealOfTheDay?.image || "/fallback.png"}
               alt={showDealOfTheDay?.title || "Deal"}
@@ -404,112 +308,126 @@ const PlaceOrderForm = () => {
               className="object-contain rounded-lg"
             />
           </div>
-          <div className="text-center">
+          <div>
             <h3 className="font-medium text-lg">{showDealOfTheDay?.title}</h3>
+            <p className="text-gray-600">₹{showDealOfTheDay?.price}</p>
             <p className="text-gray-600">
-              Subtitle: {showDealOfTheDay?.subtitle}
-            </p>
-            <p className="text-gray-600">Price: {showDealOfTheDay?.price}</p>
-            <p className="text-gray-600">
-              Quantity: {showDealOfTheDay?.quantity}
+              Qty: {showDealOfTheDay?.quantity || 1}
             </p>
           </div>
         </div>
 
-        <form className="space-y-4">
-          {/* Name & Phone */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Full Name
-              </label>
-              <input
-                type="text"
-                value={loginForm.name}
-                placeholder="Enter your name"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                onChange={(e) =>
-                  setLoginForm((prev) => {
-                    const updated = { ...prev, name: e.target.value };
-                    debouncedGenerateOTP(updated); // Pass the latest form
-                    return updated;
-                  })
-                }
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                value={loginForm.phone}
-                placeholder="Enter phone number"
-                maxLength={10}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                onChange={(e) =>
-                  setLoginForm((prev) => {
-                    const updated = { ...prev, phone: e.target.value };
-                    debouncedGenerateOTP(updated); // Pass latest form
-                    return updated;
-                  })
-                }
-              />
-            </div>
-          </div>
+        <form className="space-y-4" onSubmit={handlePlaceOrder}>
+          {/* Name */}
+          <input
+            type="text"
+            placeholder="Full Name"
+            className="w-full border px-3 py-2 rounded-lg"
+            value={loginForm.name}
+            onChange={(e) =>
+              setLoginForm({ ...loginForm, name: e.target.value })
+            }
+          />
 
-          {/* OTP */}
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              OTP Verification
-            </label>
+          {/* Phone with Generate/Resend button */}
+          <div className="flex gap-2">
             <input
-              type="number"
-              placeholder="Enter OTP"
-              maxLength={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-              onChange={(e) => debouncedConfirmOTP(e.target.value, OTPNumber)}
+              type="tel"
+              placeholder="Phone Number"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              className="flex-1 border px-3 py-2 rounded-lg"
+              maxLength={10}
+              value={loginForm.phone}
+              onChange={(e) =>
+                setLoginForm({ ...loginForm, phone: e.target.value })
+              }
             />
-          </div>
-
-          {/* Address */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {["street", "PIN", "CITY", "state"].map((field) => (
-              <div key={field}>
-                <label className="block text-sm font-medium text-gray-600 mb-1">
-                  {field === "PIN"
-                    ? "PIN Code"
-                    : field.charAt(0).toUpperCase() + field.slice(1)}
-                </label>
-                <input
-                  type="text"
-                  value={loginForm[field]}
-                  placeholder={`Enter ${field}`}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                  onChange={(e) =>
-                    setLoginForm((prev) => {
-                      const updated = {
-                        ...prev,
-                        [field]: e.target.value,
-                      };
-                      debouncedGenerateOTP(updated);
-                      return updated;
-                    })
-                  }
-                />
-              </div>
-            ))}
-          </div>
-
-          <div className="pt-4">
             <button
-              type="submit"
-              className="w-full py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-all text-lg"
-              onClick={handlePlaceOrder}
+              type="button"
+              onClick={isGenerated ? resendOTP : handleGenerateOrResendOTP}
+              className="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 whitespace-nowrap"
+              disabled={isGenerating}
             >
-              Place Order
+              {isGenerated ? "Resend OTP" : "Get OTP"}
             </button>
           </div>
+
+          {/* OTP with Confirm button */}
+          <div className="flex gap-2">
+            <input
+              ref={otpRef}
+              type="number"
+              placeholder="Enter OTP"
+              value={inputOTP}
+              className={`flex-1 border px-3 py-2 rounded-lg focus:outline-none ${
+                otpStatus === "success"
+                  ? "border-green-500"
+                  : otpStatus === "error"
+                  ? "border-red-500"
+                  : ""
+              }`}
+              onChange={(e) => setInputOTP(e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={handleConfirmOTP}
+              className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 whitespace-nowrap"
+            >
+              Confirm
+            </button>
+          </div>
+
+          {/* Address Fields */}
+          <input
+            type="text"
+            placeholder="Street"
+            className="w-full border px-3 py-2 rounded-lg"
+            value={loginForm.street}
+            onChange={(e) =>
+              setLoginForm({ ...loginForm, street: e.target.value })
+            }
+          />
+          <input
+            type="text"
+            placeholder="PIN Code"
+            className="w-full border px-3 py-2 rounded-lg"
+            value={loginForm.PIN}
+            onChange={(e) =>
+              setLoginForm({ ...loginForm, PIN: e.target.value })
+            }
+          />
+          <input
+            type="text"
+            placeholder="City"
+            className="w-full border px-3 py-2 rounded-lg"
+            value={loginForm.CITY}
+            onChange={(e) =>
+              setLoginForm({ ...loginForm, CITY: e.target.value })
+            }
+          />
+          <input
+            type="text"
+            placeholder="State"
+            className="w-full border px-3 py-2 rounded-lg"
+            value={loginForm.state}
+            onChange={(e) =>
+              setLoginForm({ ...loginForm, state: e.target.value })
+            }
+          />
+
+          {/* Place Order Button */}
+          <button
+            type="submit"
+            className={`w-full py-3 rounded-lg text-white text-lg ${
+              isFormComplete
+                ? "bg-indigo-600 hover:bg-indigo-700"
+                : "bg-gray-400 cursor-not-allowed"
+            }`}
+            disabled={!isFormComplete}
+          >
+            Place Order
+          </button>
         </form>
       </div>
     </div>

@@ -28,6 +28,8 @@ export default function RootLayoutClient({ children }) {
     setIsAdminRoute(pathname.startsWith("/admin"));
   }, [pathname]);
 
+ 
+
   return (
     <html lang="en" className="scroll-smooth">
       <body

@@ -31,6 +31,8 @@ const AddressSection = ({
   const { addresses, loading, error } = useSelector((state) => state.address);
 
   const [showForm, setShowForm] = useState(false);
+  const [oneChange, setOneChange] = useState(null);
+
   const [editMode, setEditMode] = useState(false);
   const [currentAddress, setCurrentAddress] = useState(initialAddress);
 
@@ -211,16 +213,17 @@ const AddressSection = ({
       ) : (
         <div className="space-y-3">
           {addresses.length > 0 ? (
-            addresses.map((address) => (
+            addresses.map((address, index) => (
               <div
                 key={address._id}
                 onClick={() => {
                   setSelectedAddress(address);
+                  setOneChange(index);
                   setAddressSelected(!addressSelected);
                 }}
                 className={`p-4 border rounded-lg cursor-pointer transition-all ${
                   // selectedAddress?._id === address._id
-                  addressSelected
+                  addressSelected && oneChange == index
                     ? "border-2 border-primary bg-primary/5"
                     : "hover:border-gray-400"
                 }`}
